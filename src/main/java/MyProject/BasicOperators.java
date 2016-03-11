@@ -23,7 +23,7 @@ public class BasicOperators {
 		this.graph = g;
 		
 	}	
-	
+	/*input output are not determined, new dataset needed*/
 	public void selectOnVertices(final String label){
 		DataSet<VertexExtended<Long, HashMap<String, String>, String>> verticesSelectedByLabel = 
 			graph.getAllVertices()
