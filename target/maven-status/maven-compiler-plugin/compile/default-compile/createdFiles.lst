@@ -1,0 +1,5 @@
+org\myorg\quickstart\WordCount$LineSplitter.class
+org\myorg\quickstart\WordCount.class
+org\myorg\quickstart\SocketTextStreamWordCount.class
+org\myorg\quickstart\Job.class
+org\myorg\quickstart\SocketTextStreamWordCount$LineSplitter.class
