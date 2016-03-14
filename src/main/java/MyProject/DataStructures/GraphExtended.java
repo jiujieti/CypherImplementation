@@ -12,37 +12,38 @@ import org.apache.flink.api.common.functions.MapFunction;
 
 /**
  * Extended graph for Cypher Implementation
- * @param <K> the key type for edge and vertex identifiers
- * @param <VV> the value type of vertex properties
- * @param <VE> the value type of vertex label
- * @param <EV> the value type of edge properties
- * @param <EE> the value type of edge label
+ * @param <K> the key type for vertex identifiers
+ * @param <VL> the value type of vertex labels
+ * @param <VP> the value type of vertex properties
+ * @param <E> the key type for edge identifiers
+ * @param <EL> the value type of edge label
+ * @param <EP> the value type of edge properties
+ * 
  */
 
-public class GraphExtended<K, VV extends HashMap<String, String>, VE, 
-							  EV extends HashMap<String, String>, EE> {
+public class GraphExtended<K, VL, VP, E, EL, EP> {
 	
 	
 	/*adjacent lists migth be added later*/
-	private final DataSet<VertexExtended<K, VV, VE>> vertices;
-	private final DataSet<EdgeExtended<K, EV, EE>> edges;
+	private final DataSet<VertexExtended<K, VL, VP>> vertices;
+	private final DataSet<EdgeExtended<E, K, EL, EP>> edges;
 	private final ExecutionEnvironment context;
 	
 	/*initialization*/
-	private GraphExtended(DataSet<VertexExtended<K, VV, VE>> vertices, 
-				  DataSet<EdgeExtended<K, EV, EE>> edges, ExecutionEnvironment context) {
+	private GraphExtended(DataSet<VertexExtended<K, VL, VP>> vertices, 
+				  DataSet<EdgeExtended<E, K, EL, EP>> edges, ExecutionEnvironment context) {
 		this.vertices = vertices;
 		this.edges = edges;
 		this.context = context;
 	}
 	
 	/*get all edges in a graph*/
-	public DataSet<EdgeExtended<K, EV, EE>> getAllEdges(){
+	public DataSet<EdgeExtended<E, K, EL, EP>> getAllEdges(){
 		return this.edges;
 	}
 	
 	/*get all vertices in a graph*/
-	public DataSet<VertexExtended<K, VV, VE>> getAllVertices(){
+	public DataSet<VertexExtended<K, VL, VP>> getAllVertices(){
 		return this.vertices;
 	}
 	
@@ -64,11 +65,11 @@ public class GraphExtended<K, VV extends HashMap<String, String>, VE,
 	/*Obtain initial vertex IDs in the graph*/
 	public DataSet<ArrayList<K>> getInitialVertexIds(){
 		DataSet<ArrayList<K>> initialVertexIds = vertices.map(
-				new MapFunction<VertexExtended<K, VV, VE>, ArrayList<K>>() {
+				new MapFunction<VertexExtended<K, VL, VP>, ArrayList<K>>() {
 					private static final long serialVersionUID = 1L;
 
 					@Override
-					public ArrayList<K> map(VertexExtended<K, VV, VE> vertex){
+					public ArrayList<K> map(VertexExtended<K, VL, VP> vertex){
 						ArrayList<K> vertexId = new ArrayList<K>();
 						vertexId.add(vertex.f0);
 						return vertexId;

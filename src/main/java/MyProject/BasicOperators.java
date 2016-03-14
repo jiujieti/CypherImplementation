@@ -14,27 +14,27 @@ import org.apache.flink.util.Collector;
 
 public class BasicOperators {
 	
-	private final GraphExtended<Long, HashMap<String, String>, String,
-	  HashMap<String, String>, String> graph;
+	private final GraphExtended<Long, String, HashMap<String, String>, String,
+	  String, HashMap<String, String>> graph;
 	
 	/*get the input graph*/
-	public BasicOperators(GraphExtended<Long, HashMap<String, String>, String,
-			  HashMap<String, String>, String> g) {
+	public BasicOperators(GraphExtended<Long, String, HashMap<String, String>, String,
+			  String, HashMap<String, String>> g) {
 		this.graph = g;
 		
 	}	
 	/*input output are not determined, new dataset needed*/
 	public void selectOnVertices(final String label){
-		DataSet<VertexExtended<Long, HashMap<String, String>, String>> verticesSelectedByLabel = 
+		DataSet<VertexExtended<Long, String, HashMap<String, String>>> verticesSelectedByLabel = 
 			graph.getAllVertices()
 				 /*filter all vertices by label*/
 				 .filter(
-					new FilterFunction<VertexExtended<Long, HashMap<String, String>, String>>(){
+					new FilterFunction<VertexExtended<Long, String, HashMap<String, String>>>(){
 					
 						private static final long serialVersionUID = 1L;
 						@Override
 						public boolean filter(
-							VertexExtended<Long, HashMap<String, String>, String> vertex)
+							VertexExtended<Long, String, HashMap<String, String>> vertex)
 							throws Exception {
 						if(vertex.f2.equals(label) | label.isEmpty())
 							return true;
@@ -44,18 +44,18 @@ public class BasicOperators {
 	}
 	
 	public void selectOnVertices(final HashMap<String, String> props){
-		DataSet<VertexExtended<Long, HashMap<String, String>, String>> verticesSelectedByProps = 
+		DataSet<VertexExtended<Long, String, HashMap<String, String>>> verticesSelectedByProps = 
 			graph.getAllVertices()
 			/*filter all vertices by properties*/
 				 .filter(
-					new FilterFunction<VertexExtended<Long, HashMap<String, String>, String>>(){
+					new FilterFunction<VertexExtended<Long, String, HashMap<String, String>>>(){
 						
 						private static final long serialVersionUID = 1L;
 						@Override
 						public boolean filter(
-							VertexExtended<Long, HashMap<String, String>, String> vertex)
+							VertexExtended<Long, String, HashMap<String, String>> vertex)
 									throws Exception {
-							HashMap<String, String> propsOfVertex = vertex.f1;
+							HashMap<String, String> propsOfVertex = vertex.f2;
 							if(props.isEmpty())
 								return true;
 							for(Map.Entry<String, String> entry : propsOfVertex.entrySet()) {

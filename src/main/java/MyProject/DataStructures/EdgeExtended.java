@@ -1,60 +1,70 @@
 package MyProject.DataStructures;
 
-import org.apache.flink.api.java.tuple.Tuple4;
-import java.util.HashMap;
+import org.apache.flink.api.java.tuple.Tuple5;
+//import java.util.HashMap;
 /**
  * Extended edge for Cypher Implementation
+ * @param <E> the key type for the edges
  * @param <K> the key type for the sources and target vertices
- * @param <V> the edge properties type
- * @param <E> the edge label type
- */
+ * @param <L> the edge label type
+ * @param <P> the edge properties type
+ *  */
 
-public class EdgeExtended<K, V extends HashMap<String, String>, E> extends Tuple4<K, K, V, E>{
+public class EdgeExtended<E, K, L, P> extends Tuple5<E, K, K, L, P>{
 	
 	private static final long serialVersionUID = 1L;
 	
 	public EdgeExtended(){}
 
-	public EdgeExtended(K srcId, K trgId, V props, E label) {
-		this.f0 = srcId;
-		this.f1 = trgId;
-		this.f2 = props;
+	public EdgeExtended(E edgeId, K srcId, K trgId, L label, P props) {
+		this.f0 = edgeId;
+		this.f1 = srcId;
+		this.f2 = trgId;
 		this.f3 = label;
+		this.f4 = props;
+	}
+	
+	public void setEdgeId(E edgeId) {
+		this.f0 = edgeId;
+	}
+
+	public E getEdgeId() {
+		return this.f0;
 	}
 	
 	public void setSourceId(K srcId) {
-		this.f0 = srcId;
+		this.f1 = srcId;
 	}
 
 	public K getSourceId() {
-		return this.f0;
+		return this.f1;
 	}
 
 	public void setTargetId(K targetId) {
-		this.f1 = targetId;
+		this.f2 = targetId;
 	}
 
 	public K getTargetId() {
-		return f1;
-	}
-
-	public void setProps(V props) {
-		this.f2 = props;
-	}
-
-	public V getProps() {
 		return f2;
 	}
-	
-	public void setLabel(E label) {
+
+	public void setLabel(L label) {
 		this.f3 = label;
 	}
 
-	public E getLabel() {
+	public L getLabel() {
 		return f3;
 	}
+
+	public void setProps(P props) {
+		this.f4 = props;
+	}	
 	
-	public boolean containsLabel(E labelInput) {
+	public P getProps() {
+		return f4;
+	}
+		
+/*	public boolean containsLabel(E labelInput) {
 		if(labelInput.equals(f3))
 			return true;
 		else return false;
@@ -62,5 +72,5 @@ public class EdgeExtended<K, V extends HashMap<String, String>, E> extends Tuple
 	
 	public boolean containsProps(V propsInput) {
 		return true;
-	}
+	}*/
 }
