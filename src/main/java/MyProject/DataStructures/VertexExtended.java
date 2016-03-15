@@ -1,7 +1,7 @@
 package MyProject.DataStructures;
 
 import org.apache.flink.api.java.tuple.Tuple3;
-//import java.util.HashMap;;
+
 /**
  * Extended vertex for Cypher Implementation
  * @param <K> the key type for the vertex ID

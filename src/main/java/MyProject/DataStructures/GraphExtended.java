@@ -1,14 +1,13 @@
 package MyProject.DataStructures;
 
-import java.util.HashMap;
-import java.util.ArrayList;
+import java.util.Collection;
 
 
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple1;
+
 import org.apache.flink.api.common.functions.MapFunction;
-
-
 
 /**
  * Extended graph for Cypher Implementation
@@ -23,8 +22,7 @@ import org.apache.flink.api.common.functions.MapFunction;
 
 public class GraphExtended<K, VL, VP, E, EL, EP> {
 	
-	
-	/*adjacent lists migth be added later*/
+	/*adjacent lists might be added later*/
 	private final DataSet<VertexExtended<K, VL, VP>> vertices;
 	private final DataSet<EdgeExtended<E, K, EL, EP>> edges;
 	private final ExecutionEnvironment context;
@@ -38,44 +36,47 @@ public class GraphExtended<K, VL, VP, E, EL, EP> {
 	}
 	
 	/*get all edges in a graph*/
-	public DataSet<EdgeExtended<E, K, EL, EP>> getAllEdges(){
-		return this.edges;
+	public DataSet<EdgeExtended<E, K, EL, EP>> getEdges(){
+		return edges;
 	}
 	
 	/*get all vertices in a graph*/
-	public DataSet<VertexExtended<K, VL, VP>> getAllVertices(){
-		return this.vertices;
+	public DataSet<VertexExtended<K, VL, VP>> getVertices(){
+		return vertices;
 	}
 	
-	/*Obtain initial pairs of connected vertex IDs in the graph through edges*/
-	/*public DataSet<LinkedList<K>> getInitialEdges(){
-		DataSet<LinkedList<K>> initialEdges = edges.map(
-				new MapFunction<EdgeExtended<K, EV, EE>, LinkedList<K>>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public LinkedList<K> map(EdgeExtended<K, EV, EE> edge){
-						LinkedList<K> linkedList = new LinkedList<K>();
-						linkedList.add(edge.f0);
-						linkedList.add(edge.f1);
-						return linkedList;
-					}});
-		return initialEdges;
-	}*/
-	/*Obtain initial vertex IDs in the graph*/
-	public DataSet<ArrayList<K>> getInitialVertexIds(){
-		DataSet<ArrayList<K>> initialVertexIds = vertices.map(
-				new MapFunction<VertexExtended<K, VL, VP>, ArrayList<K>>() {
-					private static final long serialVersionUID = 1L;
-
-					@Override
-					public ArrayList<K> map(VertexExtended<K, VL, VP> vertex){
-						ArrayList<K> vertexId = new ArrayList<K>();
-						vertexId.add(vertex.f0);
-						return vertexId;
-					}});
-		return initialVertexIds;
+	/*get the environment*/
+	public ExecutionEnvironment getExecutionEnvironment() {
+		return context;
 	}
 	
+	/*get all vertex IDs*/
+	public DataSet<Tuple1<K>> getAllVertexIds() {
+		DataSet<Tuple1<K>> vertexIds = vertices.map(new MapFunction<VertexExtended<K, VL, VP>, Tuple1<K>>(){
+
+			private static final long serialVersionUID = 1L;
+
+			@Override
+			public Tuple1<K> map(VertexExtended<K, VL, VP> vertex) throws Exception {
+				return new Tuple1<K>(vertex.f0);
+			}	
+		});
+		return vertexIds;
+	}
+	
+	public static <K, VL, VP, E, EL, EP> GraphExtended<K, VL, VP, E, EL, EP> 
+		fromCollection(Collection<VertexExtended<K, VL, VP>> vertices,
+			Collection<EdgeExtended<E, K, EL, EP>> edges, ExecutionEnvironment context) {
+
+		return fromDataSet(context.fromCollection(vertices),
+				context.fromCollection(edges), context);
+	}
+	
+	public static <K, VL, VP, E, EL, EP> GraphExtended<K, VL, VP, E, EL, EP> 
+		fromDataSet(DataSet<VertexExtended<K, VL, VP>> vertices,
+			DataSet<EdgeExtended<E, K, EL, EP>> edges, ExecutionEnvironment context) {
+
+		return new GraphExtended<K, VL, VP, E, EL, EP>(vertices, edges, context);
+	}
 	/*NOT FINISHED YET*/
 }

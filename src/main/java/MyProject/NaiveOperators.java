@@ -8,6 +8,10 @@ import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.operators.Grouping;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 
+
+
+
+import java.util.ArrayList;
 import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
@@ -170,6 +174,15 @@ public class NaiveOperators {
 						}
 					});
 	s.print();
+	
+	
+	
+    
+	
+//	DataSet<ListsForTriplets<Integer, Long, String>> d1 = env.fromElements(l1).groupBy()
+	
 	}
+	
+	
 }
 
