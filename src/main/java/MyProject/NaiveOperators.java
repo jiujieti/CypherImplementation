@@ -108,8 +108,7 @@ public class NaiveOperators {
 		vertexList.add(v7);
 		
 		Graph<Long, HashMap<String, String>, HashMap<String, String>> graph = Graph.fromCollection(vertexList, edgeList, env);
-		Graph<Long, HashMap<String, String>, HashMap<String, String>> g1 = PathSelection.unitPath1(e1, graph);
-		Graph<Long, HashMap<String, String>, HashMap<String, String>> g2 = PathSelection.unitPath1(e2, graph);
+		
 		//g2.getEdges().print();
 		//Joins a = new Joins();
 		
