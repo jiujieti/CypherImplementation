@@ -56,8 +56,12 @@ public class UnaryOperatorsTest {
 	      graph.getEdges().print();
 	      
 	      ScanOperators s = new ScanOperators(graph);
-	      UnaryOperators u = new UnaryOperators(s.getInitialVertices());
-	      u.selectOnVertices().print();
+	      UnaryOperators u = new UnaryOperators(graph, s.getInitialVertices());
+	      
+	      ArrayList<String> labels = new ArrayList<>();
+	      labels.add("Person");
+	      u.selectOnVerticesByLabels(labels, 0).print();
+	      
 	      
 	      
 	      

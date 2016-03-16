@@ -153,6 +153,7 @@ public class NaiveOperators {
 				});
 		DataSet<LinkedList<String>> s3 = s1.getDataSet();
 		DataSet<LinkedList<String>> s4 = s2.getDataSet();
+		s3.print();
 		DataSet<LinkedList<String>> s = s3.join(s4).where(
 				new  KeySelector<LinkedList<String>, String>()
 				{
@@ -173,7 +174,7 @@ public class NaiveOperators {
 							out.collect(first);
 						}
 					});
-	s.print();
+	//s.print();
 	
 	
 	
