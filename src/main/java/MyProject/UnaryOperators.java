@@ -7,6 +7,7 @@ import java.util.Map;
 import MyProject.DataStructures.*;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.*;
@@ -30,7 +31,7 @@ public class UnaryOperators {
 	}
 	
 	/*No specific queries on the current vertices*/
-	public DataSet<ArrayList<Tuple2<String, Long>>> selectOnVertices() {
+	public DataSet<ArrayList<Tuple2<String, Long>>> selectVertices() {
 		return vertexAndEdgeIds;
 	}
 	
@@ -164,10 +165,38 @@ public class UnaryOperators {
 						!vertex.getProps().get(propInQuery.getKey()).equals(propInQuery.getValue())) 
 					return;
 			}
+			/*Check if the labels mentioned in the query are contained in the vertex label list*/
 			if(vertex.getLabels().containsAll(labs))
 				outEdgesAndVertices.collect(edgesAndVertices);
 		}	
 	}
+	
+	/*No specific queries on the current edge*/
+	public DataSet<ArrayList<Tuple2<String, Long>>> selectEdge(int pos){
+		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
+				.groupBy(new KeySelectorOfVertices(pos))
+				.getDataSet()
+				.join(graph.getEdges())
+				.where(new KeySelectorOfVertices(pos))
+				.equalTo(1)
+				.with(new JoinEdges());
+		this.vertexAndEdgeIds = selectedResults;
+		return selectedResults;
+	}
+	
+	private static class JoinEdges implements
+		JoinFunction<ArrayList<Tuple2<String, Long>>, EdgeExtended<String, Long, String,
+	HashMap<String, String>>, ArrayList<Tuple2<String, Long>>> {
+
+	@Override
+	public ArrayList<Tuple2<String, Long>> join(
+			ArrayList<Tuple2<String, Long>> vertexAndEdgeIds,
+			EdgeExtended<String, Long, String, HashMap<String, String>> edge)
+			throws Exception {
+			vertexAndEdgeIds.add(new Tuple2<String, Long>(edge.f0, edge.f2));
+		return vertexAndEdgeIds;
+	}	
+}
 	
 		
 }

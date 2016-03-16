@@ -11,12 +11,13 @@ import org.apache.flink.api.common.functions.FlatJoinFunction;
 
 
 
-import java.util.ArrayList;
+
 import java.util.List;
 import java.util.LinkedList;
 import java.util.HashMap;
 
 public class NaiveOperators {
+	@SuppressWarnings({ "serial", "unused" })
 	public static void main(String[] args) throws Exception {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 	/*	HashMap<String, String> myHashMap1 = new HashMap<>();

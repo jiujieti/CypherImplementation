@@ -12,6 +12,7 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 
 public class Joins {
 	//Here coGroup must be used because a nested iteration is required potentially
+	@SuppressWarnings("serial")
 	public Graph<Long, HashMap<String, String>, HashMap<String, String>> joinEdgesOnSource
 	(Graph<Long, HashMap<String, String>, HashMap<String, String>> gorg,
 			Graph<Long, HashMap<String, String>, HashMap<String, String>> gjoin,
@@ -38,6 +39,7 @@ public class Joins {
 		return Graph.fromDataSet(gorg.getVertices(), resEdges, env);
 	}
 	
+	@SuppressWarnings("serial")
 	public Graph<Long, HashMap<String, String>, HashMap<String, String>> joinEdgesOnSource1
 	(Graph<Long, HashMap<String, String>, HashMap<String, String>> gorg,
 			Graph<Long, HashMap<String, String>, HashMap<String, String>> gjoin,
@@ -72,6 +74,7 @@ public class Joins {
 	(Graph<Long, HashMap<String, String>, HashMap<String, String>> gorg,
 			Graph<Long, HashMap<String, String>, HashMap<String, String>> gjoin,
 			ExecutionEnvironment env) {
+		@SuppressWarnings("serial")
 		DataSet<Edge<Long, HashMap<String, String>>> resEdges = gorg.getEdges()
 				.coGroup(gjoin.getEdges())
 				.where(1)
@@ -100,6 +103,7 @@ public class Joins {
 	(Graph<Long, HashMap<String, String>, HashMap<String, String>> gorg,
 			Graph<Long, HashMap<String, String>, HashMap<String, String>> gjoin,
 			ExecutionEnvironment env) {
+		@SuppressWarnings("serial")
 		DataSet<Edge<Long, HashMap<String, String>>> resEdges = gorg.getEdges()
 				.coGroup(gjoin.getEdges())
 				.where(1)

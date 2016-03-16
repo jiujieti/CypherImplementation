@@ -61,13 +61,13 @@ public class UnaryOperatorsTest {
 	      ArrayList<String> labels = new ArrayList<>();
 	      labels.add("Person");
 	      
-	      //u.selectOnVerticesByLabels(labels, 0).print();
+	      //u.selectVerticesByLabels(labels, 0).print();
 	      
 	      HashMap<String, String> props = new HashMap<>();
 	      props.put("name", "John");
 	      props.put("age", "48");
-	      //u.selectOnVerticesByProperties(props, 0).print();
-	      u.selectVertices(labels, props, 0).print();
+	      //u.selectVerticesByProperties(props, 0).print();
+	      //u.selectVertices(labels, props, 0).print();
 	      
 	      
 	}
