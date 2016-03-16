@@ -1,28 +1,27 @@
 package MyProject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.HashSet;
 
 import MyProject.DataStructures.*;
 
-import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.util.Collector;
 
+@SuppressWarnings("serial")
 public class UnaryOperators {
-	
+	/*Input graph*/
 	private GraphExtended<Long, ArrayList<String>, HashMap<String, String>, String,
 	  String, HashMap<String, String>> graph;
+	
+	/*Each list contains the vertex IDs and edge IDs of a selected path so far */
 	private DataSet<ArrayList<Tuple2<String, Long>>> vertexAndEdgeIds;
 	
-	/*get the input graph, current columnNumber and the vertex and edges Ids*/
+	/*Get the input graph, current columnNumber and the vertex and edges IDs*/
 	public UnaryOperators(GraphExtended<Long, ArrayList<String>, HashMap<String, String>, String,
 			  String, HashMap<String, String>> g,
 			  DataSet<ArrayList<Tuple2<String, Long>>> verticesAndEdges) {
@@ -30,39 +29,45 @@ public class UnaryOperators {
 		this.vertexAndEdgeIds = verticesAndEdges;
 	}
 	
-	/*No requirements on the current vertices*/
+	/*No specific queries on the current vertices*/
 	public DataSet<ArrayList<Tuple2<String, Long>>> selectOnVertices() {
 		return vertexAndEdgeIds;
 	}
 	
-	public DataSet<ArrayList<Tuple2<String, Long>>> selectOnVerticesByLabels(ArrayList<String> labels, final int colNum){
+	/*Select all vertices by their labels*/
+	public DataSet<ArrayList<Tuple2<String, Long>>> selectVerticesByLabels(ArrayList<String> labs, int pos){
 		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
-			.groupBy(new KeySelectorOfVertices(colNum))
+			/*Group the list according to the current position of the vertices to be processed*/
+			.groupBy(new KeySelectorOfVertices(pos))
+			/*Transfer the unsorted grouping into DataSet*/
 			 .getDataSet()
+			 /*Join with the vertices in the input graph then filter these vertices based on labels*/
 			 .join(graph.getVertices())
-			 .where(new KeySelectorOfVertices(colNum))
+			 .where(new KeySelectorOfVertices(pos))
 			 .equalTo(0)
-			 .with(new JoinAndFilterVerticesByLabels(labels));
+			 .with(new JoinAndFilterVerticesByLabels(labs));
+		
+		this.vertexAndEdgeIds = selectedResults;
 		return selectedResults;
 	}
 	
 	private static class KeySelectorOfVertices implements 
-	KeySelector<ArrayList<Tuple2<String, Long>>, Long> {
-		private static final long serialVersionUID = 1L;
-		private int colNum = 0;
+		KeySelector<ArrayList<Tuple2<String, Long>>, Long> {
 
-		KeySelectorOfVertices(int columnNum) {this.colNum = columnNum;}
+		private int pos = 0;
+
+		KeySelectorOfVertices(int position) {this.pos = position;}
 		@Override
 		public Long getKey(ArrayList<Tuple2<String, Long>> row)
 				throws Exception {
-			return row.get(colNum).f1;
+			return row.get(pos).f1;
 		}
 	}
+	
 	private static class JoinAndFilterVerticesByLabels implements
 			FlatJoinFunction<ArrayList<Tuple2<String, Long>>, VertexExtended<Long, ArrayList<String>,
 			HashMap<String, String>>, ArrayList<Tuple2<String, Long>>> {
 
-		private static final long serialVersionUID = 1L;
 		private ArrayList<String> labels = new ArrayList<>();
 		JoinAndFilterVerticesByLabels(ArrayList<String> labelList) { this.labels = labelList;}
 		@Override
@@ -71,58 +76,98 @@ public class UnaryOperators {
 				VertexExtended<Long, ArrayList<String>, HashMap<String, String>> vertex,
 				Collector<ArrayList<Tuple2<String, Long>>> outEdgesAndVertices)
 				throws Exception {
+					/*Check if the labels mentioned in the query are contained in the vertex label list*/
 					if(vertex.getLabels().containsAll(labels))
 						outEdgesAndVertices.collect(edgesAndVertices);
 		}	
-	};
+	}
 		
+	public DataSet<ArrayList<Tuple2<String, Long>>> selectVerticesByProperties(HashMap<String, String> props, int pos){
+		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
+			/*Group the list according to the current position of the vertices to be processed*/
+			.groupBy(new KeySelectorOfVertices(pos))
+			/*Transfer the unsorted grouping into DataSet*/
+			.getDataSet()
+			/*Join with the vertices in the input graph then filter these vertices based on properties*/
+			.join(graph.getVertices())
+			.where(new KeySelectorOfVertices(pos))
+			.equalTo(0)
+			.with(new JoinAndFilterVerticesByProperties(props));
+		
+		this.vertexAndEdgeIds = selectedResults;
+		return selectedResults;
+	}
+	
+	private static class JoinAndFilterVerticesByProperties implements
+		FlatJoinFunction<ArrayList<Tuple2<String, Long>>, VertexExtended<Long, ArrayList<String>,
+			HashMap<String, String>>, ArrayList<Tuple2<String, Long>>> {
 
-	/*public void selectOnVertices(final HashMap<String, String> props){
-		DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> verticesSelectedByProps = 
-			
-			graph.getVertices()
-			
-				 .filter(
-					new FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>(){
-						
-						private static final long serialVersionUID = 1L;
-						@Override
-						public boolean filter(
-							VertexExtended<Long, HashSet<String>, HashMap<String, String>> vertex)
-									throws Exception {
-							HashMap<String, String> propsOfVertex = vertex.f2;
-							if(props.isEmpty())
-								return true;
-							for(Map.Entry<String, String> entry : propsOfVertex.entrySet()) {
-								if(propsOfVertex.get(entry.getKey()) == null || 
-										!propsOfVertex.get(entry.getKey()).equals(entry.getValue()))
-									return false;
-							}
-							return true;
-						}
-					});
-	}*/
-	public void selectOnVertices(String label, HashMap<String, String> props){
-		
-	}
-	
-	public void selectOnVertices(String[] label){
-		
-	}
+			private HashMap<String, String> props = new HashMap<>();
+			JoinAndFilterVerticesByProperties(HashMap<String, String> properties) { this.props = properties;}
 
+			@Override
+			public void join(
+					ArrayList<Tuple2<String, Long>> edgesAndVertices,
+					VertexExtended<Long, ArrayList<String>, HashMap<String, String>> vertex,
+					Collector<ArrayList<Tuple2<String, Long>>> outEdgesAndVertices)
+							throws Exception {
+				/*For each property (key-value pair) appeared in query*/
+				for(Map.Entry<String, String> propInQuery : props.entrySet()) {
+					/*If the vertex does not contain the specific key*/
+					if(vertex.getProps().get(propInQuery.getKey()) == null || 
+							/*If the key is contained, check if the value is consistent or not*/
+							!vertex.getProps().get(propInQuery.getKey()).equals(propInQuery.getValue())) 
+						return;
+				}
+				outEdgesAndVertices.collect(edgesAndVertices);
+			}	
+	}
 	
-	public void selectOnEdges(){
+	public DataSet<ArrayList<Tuple2<String, Long>>> selectVertices(ArrayList<String> labs, 
+			HashMap<String, String> props, int pos){
+		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
+			/*Group the list according to the current position of the vertices to be processed*/
+			.groupBy(new KeySelectorOfVertices(pos))
+			/*Transfer the unsorted grouping into DataSet*/
+			.getDataSet()
+			/*Join with the vertices in the input graph then filter these vertices based on properties*/
+			.join(graph.getVertices())
+			.where(new KeySelectorOfVertices(pos))
+			.equalTo(0)
+			.with(new JoinAndFilterVertices(labs, props));
 		
+		this.vertexAndEdgeIds = selectedResults;
+		return selectedResults;
 	}
 	
-	public static void projectOnVertices(){
-	
-	}
-	
-	public static void projectOnEdges(){
-		
-	}
+	private static class JoinAndFilterVertices implements
+		FlatJoinFunction<ArrayList<Tuple2<String, Long>>, VertexExtended<Long, ArrayList<String>,
+		HashMap<String, String>>, ArrayList<Tuple2<String, Long>>> {
+		private ArrayList<String> labs = new ArrayList<>();
+		private HashMap<String, String> props = new HashMap<>();
+		JoinAndFilterVertices(ArrayList<String> labels, HashMap<String, String> properties) { 
+			this.labs = labels;
+			this.props = properties;
+		}
 
+		@Override
+		public void join(
+				ArrayList<Tuple2<String, Long>> edgesAndVertices,
+				VertexExtended<Long, ArrayList<String>, HashMap<String, String>> vertex,
+				Collector<ArrayList<Tuple2<String, Long>>> outEdgesAndVertices)
+						throws Exception {
+			/*For each property (key-value pair) appeared in the query*/
+			for(Map.Entry<String, String> propInQuery : props.entrySet()) {
+				/*If the vertex does not contain the specific key*/
+				if(vertex.getProps().get(propInQuery.getKey()) == null || 
+						/*If the key is contained, check if the value is consistent or not*/
+						!vertex.getProps().get(propInQuery.getKey()).equals(propInQuery.getValue())) 
+					return;
+			}
+			if(vertex.getLabels().containsAll(labs))
+				outEdgesAndVertices.collect(edgesAndVertices);
+		}	
+	}
 	
 		
 }
