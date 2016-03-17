@@ -66,8 +66,8 @@ public class UnaryOperatorsTest {
 	      HashMap<String, String> props = new HashMap<>();
 	      props.put("name", "John");
 	      props.put("age", "48");
-	      //u.selectVerticesByProperties(props, 0).print();
-	      //u.selectVertices(labels, props, 0).print();
+	      u.selectVerticesByProperties(props, 0).print();
+	      u.selectVertices(labels, props, 0).print();
 	      
 	      
 	}

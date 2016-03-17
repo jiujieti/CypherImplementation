@@ -5,11 +5,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import MyProject.DataStructures.*;
+import MyProject.KeySelectorForVertices;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.*;
 import org.apache.flink.util.Collector;
 
@@ -37,32 +37,20 @@ public class UnaryOperators {
 	
 	/*Select all vertices by their labels*/
 	public DataSet<ArrayList<Tuple2<String, Long>>> selectVerticesByLabels(ArrayList<String> labs, int col){
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col);
 		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
 			/*Group the list according to the current position of the vertices to be processed*/
-			.groupBy(new KeySelectorForVertices(col))
+			.groupBy(verticesSelector)
 			/*Transfer the unsorted grouping into DataSet*/
 			 .getDataSet()
 			 /*Join with the vertices in the input graph then filter these vertices based on labels*/
 			 .join(graph.getVertices())
-			 .where(new KeySelectorForVertices(col))
+			 .where(verticesSelector)
 			 .equalTo(0)
 			 .with(new JoinAndFilterVerticesByLabels(labs));
 		
 		this.vertexAndEdgeIds = selectedResults;
 		return selectedResults;
-	}
-	
-	private static class KeySelectorForVertices implements 
-		KeySelector<ArrayList<Tuple2<String, Long>>, Long> {
-
-		private int col = 0;
-
-		KeySelectorForVertices(int column) {this.col = column;}
-		@Override
-		public Long getKey(ArrayList<Tuple2<String, Long>> row)
-				throws Exception {
-			return row.get(col).f1;
-		}
 	}
 	
 	private static class JoinAndFilterVerticesByLabels implements
@@ -84,14 +72,15 @@ public class UnaryOperators {
 	}
 		
 	public DataSet<ArrayList<Tuple2<String, Long>>> selectVerticesByProperties(HashMap<String, String> props, int col){
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col);
 		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
 			/*Group the list according to the current position of the vertices to be processed*/
-			.groupBy(new KeySelectorForVertices(col))
+			.groupBy(verticesSelector)
 			/*Transfer the unsorted grouping into DataSet*/
 			.getDataSet()
 			/*Join with the vertices in the input graph then filter these vertices based on properties*/
 			.join(graph.getVertices())
-			.where(new KeySelectorForVertices(col))
+			.where(verticesSelector)
 			.equalTo(0)
 			.with(new JoinAndFilterVerticesByProperties(props));
 		
@@ -126,14 +115,15 @@ public class UnaryOperators {
 	
 	public DataSet<ArrayList<Tuple2<String, Long>>> selectVertices(ArrayList<String> labs, 
 			HashMap<String, String> props, int col){
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col);
 		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
 			/*Group the list according to the current position of the vertices to be processed*/
-			.groupBy(new KeySelectorForVertices(col))
+			.groupBy(verticesSelector)
 			/*Transfer the unsorted grouping into DataSet*/
 			.getDataSet()
 			/*Join with the vertices in the input graph then filter these vertices based on properties*/
 			.join(graph.getVertices())
-			.where(new KeySelectorForVertices(col))
+			.where(verticesSelector)
 			.equalTo(0)
 			.with(new JoinAndFilterVertices(labs, props));
 		
@@ -173,11 +163,12 @@ public class UnaryOperators {
 	
 	/*No specific queries on the current edge*/
 	public DataSet<ArrayList<Tuple2<String, Long>>> selectEdge(int col){
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col);
 		DataSet<ArrayList<Tuple2<String, Long>>> selectedResults = vertexAndEdgeIds
-				.groupBy(new KeySelectorForVertices(col))
+				.groupBy(verticesSelector)
 				.getDataSet()
 				.join(graph.getEdges())
-				.where(new KeySelectorForVertices(col))
+				.where(verticesSelector)
 				.equalTo(1)
 				.with(new JoinEdges());
 		this.vertexAndEdgeIds = selectedResults;

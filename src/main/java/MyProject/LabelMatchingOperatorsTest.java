@@ -64,16 +64,17 @@ public class LabelMatchingOperatorsTest {
      GraphExtended<Long, ArrayList<String>, HashMap<String, String>, 
      String, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 	 
-     //ScanOperators s = new ScanOperators(graph);
-     
-   //  graph.getEdges().print();
-    // graph.getVertices().print();
-     
-  //   s.getInitialVertices().print();
+     //single input test
      ArrayList<Tuple2<String, Long>> init = new ArrayList<>();
      init.add(new Tuple2<String, Long>("e0", 1L));
      DataSet<ArrayList<Tuple2<String, Long>>> initial = env.fromElements(init);
-     LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
-     l.matchWithoutBounds(0, "Likes").print();
+  // LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
+     
+     
+     // whole input test
+     ScanOperators s = new ScanOperators(graph);    
+    s.getInitialVertices().print();
+    LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
+    l.matchWithoutBounds(0, "Likes").print();
     }
 }
