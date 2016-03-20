@@ -44,7 +44,7 @@ public class LabelMatchingOperators {
 	}
 
 	/*Return all (source vertex, target vertex) pairs according to unbounded label propogation*/
-	public DataSet<Tuple2<Long, Long>> matchWithoutBounds(int col, String label) {
+	public DataSet<Tuple2<Long, Long>> matchWithoutBounds(int col, String label) throws Exception {
 		/*Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration
 		 *Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices*/
 		DataSet<Tuple2<Long, Long>> initialVertexIds = this.vertexAndEdgeIds
@@ -53,12 +53,13 @@ public class LabelMatchingOperators {
 		/*No bound restrictions, starting vertices are also part of the solution*/
 		DataSet<Tuple2<Long, Long>> initialSolutionSet = initialVertexIds;
 		
+	
 		/*Unlimited propagation steps, this number needs to be modified later*/
 		int maxIterations = 1;
 		
 		DeltaIteration<Tuple2<Long, Long>, Tuple2<Long, Long>> iteration = 
-			initialSolutionSet
-				.iterateDelta(initialVertexIds, maxIterations, 1);
+				initialSolutionSet
+					.iterateDelta(initialVertexIds, maxIterations, 0);
 		
 		/*return the new work set consisting of vertex Ids
 		 * edges are filtered by input label*/
@@ -68,25 +69,25 @@ public class LabelMatchingOperators {
 					.equalTo(1)
 					.with(new FilterEdgesByLabel(label));
 		
-		/*Next partial solution*/
-		DataSet<Tuple2<Long, Long>> deltas = iteration.getWorkset().union(nextWorkset);
-				//nextVertexIds.union(iteration.getWorkset());
+		/*Next solution*/
+		DataSet<Tuple2<Long, Long>> deltas = nextWorkset;
 		
 		
 		DataSet<Tuple2<Long, Long>> allVertexPairs = iteration.closeWith(deltas, nextWorkset);
+
 		
 		/*Update the results to ArrayList storing vertex and edge IDs 
 		 * the edge ID will be set to null*/
-		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
+		/*KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
 		DataSet<ArrayList<Tuple2<String, Long>>> results = this.vertexAndEdgeIds
 				.groupBy(verticesSelector)
 				.getDataSet()
 				.join(allVertexPairs)
 				.where(verticesSelector)
 				.equalTo(0)
-				.with(new UpdateVertexAndEdgeIds());
+				.with(new UpdateVertexAndEdgeIds());*/
 		
-		this.vertexAndEdgeIds = results;
+		//this.vertexAndEdgeIds = results;
 		return allVertexPairs;
 	}
 	
@@ -104,14 +105,14 @@ public class LabelMatchingOperators {
 	private static class FilterEdgesByLabel implements FlatJoinFunction<Tuple2<Long, Long>, 
 			EdgeExtended<String, Long, String, HashMap<String, String>>, Tuple2<Long, Long>> {
 
-		private String lab = "";
+		private String lab = null;
 		FilterEdgesByLabel(String label) { this.lab = label; }
 		@Override
 		public void join(
 				Tuple2<Long, Long> vertexIds,
 				EdgeExtended<String, Long, String, HashMap<String, String>> edge,
 				Collector<Tuple2<Long, Long>> out) throws Exception {
-			if(edge.f3.equals(lab))
+			if(edge.f3.equals(lab) && !vertexIds.f0.equals(vertexIds.f1))
 				out.collect(new Tuple2<Long, Long>(vertexIds.f0, edge.f2));			
 		}
 	}

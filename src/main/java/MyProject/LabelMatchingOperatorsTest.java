@@ -66,15 +66,18 @@ public class LabelMatchingOperatorsTest {
 	 
      //single input test
      ArrayList<Tuple2<String, Long>> init = new ArrayList<>();
-     init.add(new Tuple2<String, Long>("e0", 1L));
+     init.add(new Tuple2<String, Long>("e0", 4L));
      DataSet<ArrayList<Tuple2<String, Long>>> initial = env.fromElements(init);
-  // LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
-     
+     LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
+     l.matchWithoutBounds(0, "Likes").print();
      
      // whole input test
-     ScanOperators s = new ScanOperators(graph);    
-    s.getInitialVertices().print();
-    LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
-    l.matchWithoutBounds(0, "Likes").print();
-    }
+    ScanOperators s = new ScanOperators(graph);   
+    
+    
+    //s.getInitialVertices().print();
+   //LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
+    //l.matchWithoutBounds(0, "j").print();
+	//graph.getEdges().print();
+	}
 }
