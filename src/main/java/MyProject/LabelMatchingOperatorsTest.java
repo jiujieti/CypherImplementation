@@ -46,12 +46,15 @@ public class LabelMatchingOperatorsTest {
 			  new EdgeExtended<> ("e2", 2L, 3L, el, ep);
 	  EdgeExtended<String, Long, String, HashMap<String, String>> e3 = 
 			  new EdgeExtended<> ("e3", 3L, 4L, el, ep);
+	  EdgeExtended<String, Long, String, HashMap<String, String>> e4 =
+			  new EdgeExtended<> ("e4", 4L, 1L, el, ep);
 	  
 	  List<EdgeExtended<String, Long, String, HashMap<String, String>>> edgeList = 
 			  new ArrayList<>();
 	  edgeList.add(e1);
 	  edgeList.add(e2);
 	  edgeList.add(e3);
+	  edgeList.add(e4);
 	  
 	  
 	  List<VertexExtended<Long, ArrayList<String>, HashMap<String, String>>> vertexList = 
@@ -65,19 +68,19 @@ public class LabelMatchingOperatorsTest {
      String, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 	 
      //single input test
-     ArrayList<Tuple2<String, Long>> init = new ArrayList<>();
-     init.add(new Tuple2<String, Long>("e0", 4L));
-     DataSet<ArrayList<Tuple2<String, Long>>> initial = env.fromElements(init);
-     LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
-     l.matchWithoutBounds(0, "Likes").print();
+    // ArrayList<Tuple2<String, Long>> init = new ArrayList<>();
+    // init.add(new Tuple2<String, Long>("e0", 4L));
+    // DataSet<ArrayList<Tuple2<String, Long>>> initial = env.fromElements(init);
+     //LabelMatchingOperators l = new LabelMatchingOperators(graph, initial);
+     //l.matchWithoutBounds(0, "Likes").print();
      
      // whole input test
     ScanOperators s = new ScanOperators(graph);   
     
     
     //s.getInitialVertices().print();
-   //LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
-    //l.matchWithoutBounds(0, "j").print();
+   LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
+    l.matchWithoutBounds(0, "Likes").print();
 	//graph.getEdges().print();
 	}
 }
