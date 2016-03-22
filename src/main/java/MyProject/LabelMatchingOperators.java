@@ -2,31 +2,39 @@ package MyProject;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 
-import org.apache.flink.api.common.functions.CoGroupFunction;
+
+
+
+
+
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.api.java.operators.DeltaIteration;
 import org.apache.flink.api.java.tuple.Tuple2;
-import org.apache.flink.graph.Edge;
 import org.apache.flink.util.Collector;
 
 import MyProject.DataStructures.GraphExtended;
 import MyProject.DataStructures.EdgeExtended;
 import MyProject.KeySelectorForVertices;
-
+/* Using for loop to do the iterations now to collect those vertex IDs
+ * Some flaws are still existing here:
+ * (1) Too many iterations may cause the termination due to few memory
+ * (2) Check the result dataset then return "No vertices found" information
+ * (3) Cycle detection (unbounded label matching could not terminate regularly)
+ * (4) Duplicated code snippet (a new method to be added) 
+ * 
+ * */
 @SuppressWarnings("serial")
 public class LabelMatchingOperators {
-	/*Input graph*/
+	//Input graph
 	private GraphExtended<Long, ArrayList<String>, HashMap<String, String>, String,
 	  String, HashMap<String, String>> graph;
 	
-	/*Each list contains the vertex IDs and edge IDs of a selected path so far */
+	//Each list contains the vertex IDs and edge IDs of a selected path so far 
 	private DataSet<ArrayList<Tuple2<String, Long>>> vertexAndEdgeIds;
 
-	/*Get the input graph, current columnNumber and the vertex and edges IDs*/
+	//Get the input graph, current columnNumber and the vertex and edges IDs
 	public LabelMatchingOperators(GraphExtended<Long, ArrayList<String>, HashMap<String, String>, String,
 			  String, HashMap<String, String>> g,
 			  DataSet<ArrayList<Tuple2<String, Long>>> verticesAndEdges) {
@@ -34,33 +42,114 @@ public class LabelMatchingOperators {
 		this.vertexAndEdgeIds = verticesAndEdges;
 	}
 	
-	public void matchWithBounds(int col, int lb, int ub, String label) {
-		
-	} 
-	
-	public DataSet<Tuple2<Long, Long>> matchWithUpperBound(int col, int ub, String label) {
-		DataSet<Tuple2<Long, Long>> initialVertexIds = this.vertexAndEdgeIds
+	public DataSet<ArrayList<Tuple2<String, Long>>> matchWithBounds(int col, int lb, int ub, String label) throws Exception {
+		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration. Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
+		DataSet<Tuple2<Long, Long>> verticesWorkset = this.vertexAndEdgeIds
 				.map(new ExtractVertexIds(col));
 		
-		DataSet<Tuple2<Long, Long>> initialSolutionSet = initialVertexIds;
+		//To get the starting workset of vertices after minimum hops for further propagations  
+		for(int i = 1; i <= lb; i++) {
+			verticesWorkset = verticesWorkset.join(graph.getEdges())
+					.where(1)
+					.equalTo(1)
+					.with(new FilterEdgesByLabel(label))
+					.distinct();
+		}
 		
-		int maxIterations = ub;
+		DataSet<Tuple2<Long, Long>> allVertexPairs = verticesWorkset;
+		for(int j = 1; j <= ub - lb; j++) {
+			verticesWorkset = verticesWorkset.join(graph.getEdges())
+					.where(1)
+					.equalTo(1)
+					.with(new FilterEdgesByLabel(label))
+					.distinct();
+			if(verticesWorkset.count() == 0)
+				break;
+			allVertexPairs = allVertexPairs.union(verticesWorkset).distinct();
+		}
 		
-		DeltaIteration<Tuple2<Long, Long>, Tuple2<Long, Long>> iteration = 
-				initialSolutionSet
-					.iterateDelta(initialVertexIds, maxIterations, 1);
-		return initialVertexIds;
-		//DataSet<Tuple2<Long, Long>> nextWorkset = 
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
+		DataSet<ArrayList<Tuple2<String, Long>>> results = this.vertexAndEdgeIds
+				.groupBy(verticesSelector)
+				.getDataSet()
+				.join(allVertexPairs)
+				.where(verticesSelector)
+				.equalTo(0)
+				.with(new UpdateVertexAndEdgeIds());
+		
+		this.vertexAndEdgeIds = results;
+		return results;
 	} 
 	
-	public void matchWithLowerBound(int col, int lb, String label) {
+	public DataSet<ArrayList<Tuple2<String, Long>>> matchWithUpperBound(int col, int ub, String label) throws Exception {
+		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration. Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
+		DataSet<Tuple2<Long, Long>> verticesWorkset = this.vertexAndEdgeIds
+				.map(new ExtractVertexIds(col));
 		
+		DataSet<Tuple2<Long, Long>> allVertexPairs = verticesWorkset;
+		for(int i = 1; i <= ub; i++) {
+			verticesWorkset = verticesWorkset.join(graph.getEdges())
+					.where(1)
+					.equalTo(1)
+					.with(new FilterEdgesByLabel(label))
+					.distinct();
+			if(verticesWorkset.count() == 0)
+				break;
+			allVertexPairs = allVertexPairs.union(verticesWorkset).distinct();
+		}
+		
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
+		DataSet<ArrayList<Tuple2<String, Long>>> results = this.vertexAndEdgeIds
+				.groupBy(verticesSelector)
+				.getDataSet()
+				.join(allVertexPairs)
+				.where(verticesSelector)
+				.equalTo(0)
+				.with(new UpdateVertexAndEdgeIds());
+		
+		this.vertexAndEdgeIds = results;
+		return results;
+	} 
+	
+	public DataSet<ArrayList<Tuple2<String, Long>>> matchWithLowerBound(int col, int lb, String label) throws Exception {
+		DataSet<Tuple2<Long, Long>> verticesWorkset = this.vertexAndEdgeIds
+				.map(new ExtractVertexIds(col));
+		//To get the starting workset of vertices after minimum hops for further propagations  
+		for(int i = 1; i <= lb; i++) {
+			verticesWorkset = verticesWorkset.join(graph.getEdges())
+					.where(1)
+					.equalTo(1)
+					.with(new FilterEdgesByLabel(label))
+					.distinct();
+		}
+		DataSet<Tuple2<Long, Long>> allVertexPairs = verticesWorkset;
+		for(int j = 1; j <= 1000; j++) {
+			verticesWorkset = verticesWorkset.join(graph.getEdges())
+					.where(1)
+					.equalTo(1)
+					.with(new FilterEdgesByLabel(label))
+					.distinct();
+			if(verticesWorkset.count() == 0)
+				break;
+			allVertexPairs = allVertexPairs.union(verticesWorkset).distinct();
+		}
+		
+		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
+		DataSet<ArrayList<Tuple2<String, Long>>> results = this.vertexAndEdgeIds
+				.groupBy(verticesSelector)
+				.getDataSet()
+				.join(allVertexPairs)
+				.where(verticesSelector)
+				.equalTo(0)
+				.with(new UpdateVertexAndEdgeIds());
+		
+		this.vertexAndEdgeIds = results;
+		return results;
 	}
 
-	/*Return all (source vertex, target vertex) pairs according to unbounded label propogation*/
+	//Return all (source vertex, target vertex) pairs according to unbounded label propogation
 	public DataSet<ArrayList<Tuple2<String, Long>>> matchWithoutBounds(int col, String label) throws Exception {
-		/*Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration
-		 *Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices*/
+		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
 		DataSet<Tuple2<Long, Long>> verticesWorkset = this.vertexAndEdgeIds
 				.map(new ExtractVertexIds(col));
 			
@@ -76,6 +165,7 @@ public class LabelMatchingOperators {
 			if(verticesWorkset.count() == 0)
 				break;
 			allVertexPairs = allVertexPairs.union(verticesWorkset).distinct();
+			
 		}
 		
 		KeySelectorForVertices verticesSelector = new KeySelectorForVertices(col); 
