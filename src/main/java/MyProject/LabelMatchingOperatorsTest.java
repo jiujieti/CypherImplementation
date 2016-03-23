@@ -46,15 +46,18 @@ public class LabelMatchingOperatorsTest {
 			  new EdgeExtended<> ("e2", 2L, 3L, el, ep);
 	  EdgeExtended<String, Long, String, HashMap<String, String>> e3 = 
 			  new EdgeExtended<> ("e3", 3L, 4L, el, ep);
-	  EdgeExtended<String, Long, String, HashMap<String, String>> e4 =
-			  new EdgeExtended<> ("e4", 4L, 1L, el, ep);
+	//  EdgeExtended<String, Long, String, HashMap<String, String>> e4 =
+		//	  new EdgeExtended<> ("e4", 4L, 1L, el, ep);
+	  EdgeExtended<String, Long, String, HashMap<String, String>> e5 =
+			  new EdgeExtended<> ("e5", 1L, 3L, el, ep);
 	  
 	  List<EdgeExtended<String, Long, String, HashMap<String, String>>> edgeList = 
 			  new ArrayList<>();
 	  edgeList.add(e1);
 	  edgeList.add(e2);
 	  edgeList.add(e3);
-	  edgeList.add(e4);
+	//  edgeList.add(e4);
+	  edgeList.add(e5);
 	  
 	  
 	  List<VertexExtended<Long, ArrayList<String>, HashMap<String, String>>> vertexList = 
@@ -79,7 +82,8 @@ public class LabelMatchingOperatorsTest {
     
     
     //s.getInitialVertices().print();
-   LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
+    LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
+   //l.matchWithBounds(0, 1, 1, "Likes").print();
     l.matchWithoutBounds(0, "Likes").print();
 	//graph.getEdges().print();
 	}
