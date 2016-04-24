@@ -318,4 +318,14 @@ public class LabelMatchingOperators {
 			updateIdsList.collect(vertexAndEdgeIds);
 		}
 	}
+	
+/*	public class And implements FilterFunction<T> {
+		  FilterFunction<T> lhs, rhs;
+		  Logic(FilerFunction<T> l, r) {
+		    this.lhs = l; this.rhs = r;
+		  }
+		  bool filter(T v) {
+		    return this.lhs.filter(v) && this.rhs.filter(v);
+		  }
+		}*/
 }
