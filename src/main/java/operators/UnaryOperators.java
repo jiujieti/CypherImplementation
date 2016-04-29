@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import operators.booleanExpressions.comparisons.PropertyComparisonForVertices;
 import operators.datastructures.*;
 
 import org.apache.flink.api.common.functions.FlatJoinFunction;
@@ -67,6 +68,7 @@ public class UnaryOperators {
 				outEdgesAndVertices.collect(edgesAndVertices);
 		}	
 	}
+
 	
 	//select all vertices not including the label
 	public DataSet<ArrayList<Long>> selectReverseVerticesByLabels(int col, HashSet<String> labs){
@@ -140,6 +142,22 @@ public class UnaryOperators {
 				outEdgesAndVertices.collect(edgesAndVertices);
 			}	
 	}
+	
+	//Select vertices by property comparisons
+	public DataSet<ArrayList<Long>> selectVerticesByPropertyComparisons(int col, String propertyKey, String op,
+			double propertyValue){
+		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
+		DataSet<ArrayList<Long>> selectedResults = paths
+			//Join with the vertices in the input graph then filter these vertices based on properties
+			.join(graph.getVertices())
+			.where(verticesSelector)
+			.equalTo(0)
+			.with(new PropertyComparisonForVertices(propertyKey, op, propertyValue));
+		
+		this.paths = selectedResults;
+		return selectedResults;
+	}
+	
 	
 	//select all vertices not including the properties
 	public DataSet<ArrayList<Long>> selectReverseVerticesByProperties(int col, HashMap<String, String> props){

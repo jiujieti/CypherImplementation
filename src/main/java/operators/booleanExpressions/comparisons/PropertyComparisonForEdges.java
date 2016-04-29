@@ -1,13 +1,16 @@
 package operators.booleanExpressions.comparisons;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import operators.datastructures.EdgeExtended;
 
-import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.common.functions.FlatJoinFunction;
+import org.apache.flink.util.Collector;
 
 @SuppressWarnings("serial")
-public class PropertyComparisonForEdges implements FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>>{
+public class PropertyComparisonForEdges implements FlatJoinFunction<ArrayList<Long>, EdgeExtended<Long, Long, String,
+		HashMap<String, String>>, ArrayList<Long>>{
 	private String propertyKey;
 	private String op;
 	private double propertyValue;
@@ -17,38 +20,41 @@ public class PropertyComparisonForEdges implements FilterFunction<EdgeExtended<L
 		this.op = op;
 		this.propertyValue = propertyValue;
 	}
+	
 	@Override
-	public boolean filter(EdgeExtended<Long, Long, String, HashMap<String, String>> edge) throws Exception {
+	public void join(ArrayList<Long> edgeId,
+			EdgeExtended<Long, Long, String, HashMap<String, String>> edge,
+			Collector<ArrayList<Long>> selectedEdgeId) throws Exception {
 		if(edge.getProps().get(this.propertyKey) == null) {
-			return false;
+			return;
 		}
 		else {
 			switch(op) {
 				case ">": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) > this.propertyValue) return true;
-					else return false;	
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) > this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;	
 				}
 				case "<": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) < this.propertyValue) return true;
-					else return false;
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) < this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;	
 				}
 				case "=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) == this.propertyValue) return true;
-					else return false;
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) == this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;	
 				}
 				case ">=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) >= this.propertyValue) return true;
-					else return false;
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) >= this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;	
 				}
 				case "<=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) <= this.propertyValue) return true;
-					else return false;
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) <= this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;		
 				}
 				case "<>": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) != this.propertyValue) return true;
-					else return false;
+					if(Double.parseDouble(edge.f4.get(this.propertyKey)) != this.propertyValue) selectedEdgeId.collect(edgeId);
+					else return;	
 				}
-				default: return false;
+				default: return;
 			}
 		}
 	}

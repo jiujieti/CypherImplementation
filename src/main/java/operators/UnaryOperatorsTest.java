@@ -54,23 +54,23 @@ public class UnaryOperatorsTest {
 	      GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 		  
-	 //     graph.getVertices().print();
-	 //     graph.getEdges().print();
+	      graph.getVertices().print();
+	      graph.getEdges().print();
 	      
 	      ScanOperators s = new ScanOperators(graph);
-	    //  UnaryOperators u = new UnaryOperators(graph, s.getInitialVertices());
+	      UnaryOperators u = new UnaryOperators(graph, s.getInitialVertices());
 	      
 	      
 	      HashSet<String> labels = new HashSet<>();
-	      labels.add("Person");
+	      labels.add("User");
 	      
-	     // u.selectVerticesByLabels(0, labels).print();
+	  //    u.selectVerticesByLabels(0, labels).print();
 	     // HashMap<String, String> props = new HashMap<>();
 	      //props.put("name", "John");
-	      //props.put("age", "48");
+	      //props.put("age", "48")
 	      //u.selectVerticesByProperties(0, props).print();
 	      //u.selectVertices(0, labels, props).print();
-	      
+	      u.selectVerticesByPropertyComparisons(0, "age", ">", 10).print();
 	    // test on edges?????  
 	      
 	      
