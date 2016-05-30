@@ -313,19 +313,11 @@ public class LabelMatchingOperators {
 				ArrayList<Long> vertexAndEdgeIds,
 				Tuple2<Long, Long> vertexIds,
 				Collector<ArrayList<Long>> updateIdsList) throws Exception {
-			vertexAndEdgeIds.add(Long.MAX_VALUE);
+			//vertexAndEdgeIds.add(Long.MAX_VALUE);
 			vertexAndEdgeIds.add(vertexIds.f1);
 			updateIdsList.collect(vertexAndEdgeIds);
 		}
 	}
 	
-/*	public class And implements FilterFunction<T> {
-		  FilterFunction<T> lhs, rhs;
-		  Logic(FilerFunction<T> l, r) {
-		    this.lhs = l; this.rhs = r;
-		  }
-		  bool filter(T v) {
-		    return this.lhs.filter(v) && this.rhs.filter(v);
-		  }
-		}*/
+
 }

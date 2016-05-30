@@ -11,6 +11,7 @@ import org.apache.flink.util.Collector;
 @SuppressWarnings("serial")
 public class PropertyComparisonForEdges implements FlatJoinFunction<ArrayList<Long>, EdgeExtended<Long, Long, String,
 		HashMap<String, String>>, ArrayList<Long>>{
+	
 	private String propertyKey;
 	private String op;
 	private double propertyValue;

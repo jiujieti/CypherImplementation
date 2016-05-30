@@ -1,19 +1,12 @@
 package operators;
 
 import java.util.ArrayList;
-
-
-
-
-import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-import org.apache.flink.util.Collector;
+
 @SuppressWarnings("serial")
 public class BinaryOperators {
-	//Input graph
 	
-		
 	//Each list contains the vertex IDs and edge IDs of a selected path so far 
 	private DataSet<ArrayList<Long>> pathsLeft;
 	private DataSet<ArrayList<Long>> pathsRight;
@@ -36,17 +29,20 @@ public class BinaryOperators {
 				.join(this.pathsRight)
 				.where(SelectorFisrt)
 				.equalTo(SelectorSecond)
-				.with(new JoinOnAfterVertices());
+				.with(new JoinOnAfterVertices(secondCol));
 		return joinedResults;
 	}
 	
 	private static class JoinOnAfterVertices implements JoinFunction<ArrayList<Long>,
 	ArrayList<Long>, ArrayList<Long>>{
 
+		private int col;
+		
+		public JoinOnAfterVertices(int secondCol) {this.col = secondCol;}
 		@Override
 		public ArrayList<Long> join(ArrayList<Long> leftVertices,
 				ArrayList<Long> rightVertices) throws Exception {
-			rightVertices.remove(0);
+			rightVertices.remove(this.col);
 			leftVertices.addAll(rightVertices);
 			return leftVertices;
 		}	
@@ -62,17 +58,20 @@ public class BinaryOperators {
 				.join(this.pathsRight)
 				.where(SelectorFisrt)
 				.equalTo(SelectorSecond)
-				.with(new JoinOnBeforeVertices());
+				.with(new JoinOnBeforeVertices(firstCol));
 		return joinedResults;
 	}
 	
 	private static class JoinOnBeforeVertices implements JoinFunction<ArrayList<Long>,
 	ArrayList<Long>, ArrayList<Long>>{
-
+		
+		private int col;
+		
+		public JoinOnBeforeVertices(int firstCol) {this.col = firstCol;}
 		@Override
 		public ArrayList<Long> join(ArrayList<Long> leftPaths,
 				ArrayList<Long> rightPaths) throws Exception {
-			leftPaths.remove(0);
+			leftPaths.remove(this.col);
 			rightPaths.addAll(leftPaths);
 			return rightPaths;
 		}
@@ -103,12 +102,5 @@ public class BinaryOperators {
 		}
 	}
 	
-	//remove a subset
-//	public DataSet<ArrayList<Long>> subsetRemove() {
-//		DataSet<ArrayList<Long>> removedResults = this.pathsLeft
-//				.reduce(new Redu)
-//		return pathsLeft;
-		
-//	}
 	
 }

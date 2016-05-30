@@ -7,7 +7,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 public class AND<T> implements FilterFunction<T> {
 	private FilterFunction<T> lhs, rhs;
   
-	AND(FilterFunction<T> l, FilterFunction<T> r) {
+	public AND(FilterFunction<T> l, FilterFunction<T> r) {
 		this.lhs = l; 
 		this.rhs = r;
     }

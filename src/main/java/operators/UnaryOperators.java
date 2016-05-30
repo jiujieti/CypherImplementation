@@ -5,12 +5,16 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+import operators.booleanExpressions.FilterEdgesByBooleanExpressions;
+import operators.booleanExpressions.FilterVerticesByBooleanExpressions;
 import operators.booleanExpressions.comparisons.PropertyComparisonForVertices;
 import operators.datastructures.*;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.util.Collector;
@@ -158,6 +162,21 @@ public class UnaryOperators {
 		return selectedResults;
 	}
 	
+	//Select vertices by boolean expressions
+	public DataSet<ArrayList<Long>> selectVerticesByBooleanExpressions(int col, FilterFunction<VertexExtended<Long, HashSet<String>,
+			HashMap<String, String>>> filterVertices){
+		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
+		DataSet<ArrayList<Long>> selectedResults = paths
+			//Join with the vertices in the input graph then filter these vertices based on properties
+			.join(graph.getVertices())
+			.where(verticesSelector)
+			.equalTo(0)
+			.with(new FilterVerticesByBooleanExpressions(filterVertices));
+
+			
+		this.paths = selectedResults;
+		return selectedResults;
+	}
 	
 	//select all vertices not including the properties
 	public DataSet<ArrayList<Long>> selectReverseVerticesByProperties(int col, HashMap<String, String> props){
@@ -245,19 +264,19 @@ public class UnaryOperators {
 	}
 	
 	//No specific requirements on selected edges on right side
-	public DataSet<ArrayList<Long>> selectEdgesOnRightSide(int col){
+	public DataSet<ArrayList<Long>> selectOutEdges(int col, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(1)
-				.with(new JoinEdgesOnRightSide());
+				.with(new JoinOutEdges());
 		this.paths = selectedResults;
 		return selectedResults;
 	}
 
 	//No specific requirements on edges
-	private static class JoinEdgesOnRightSide implements
+	private static class JoinOutEdges implements
 		JoinFunction<ArrayList<Long>, EdgeExtended<Long, Long, String,
 		HashMap<String, String>>, ArrayList<Long>> {
 
@@ -272,19 +291,19 @@ public class UnaryOperators {
 	}
 	
 	//No specific requirements on selected edges on left side
-		public DataSet<ArrayList<Long>> selectEdgesOnLeftSide(int col){
+		public DataSet<ArrayList<Long>> selectInEdges(int col, JoinHint strategy){
 			KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 			DataSet<ArrayList<Long>> selectedResults = paths
-					.join(graph.getEdges())
+					.join(graph.getEdges(), strategy)
 					.where(verticesSelector)
 					.equalTo(2)
-					.with(new JoinEdgesOnLeftSide());
+					.with(new JoinInEdges());
 			this.paths = selectedResults;
 			return selectedResults;
 		}
 	
 		//No specific requirements on edges
-		private static class JoinEdgesOnLeftSide implements
+		private static class JoinInEdges implements
 			JoinFunction<ArrayList<Long>, EdgeExtended<Long, Long, String,
 			HashMap<String, String>>, ArrayList<Long>> {
 
@@ -299,22 +318,22 @@ public class UnaryOperators {
 		}
 	
 	//Select edges By Label on right side
-	public DataSet<ArrayList<Long>> selectEdgesByLabelOnRightSide(int col, String label){
+	public DataSet<ArrayList<Long>> selectOutEdgesByLabel(int col, String label, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(1)
-				.with(new JoinEdgesByLabelOnRightSide(label));
+				.with(new JoinOutEdgesByLabel(label));
 		this.paths = selectedResults;
 		return selectedResults;
 	}
 	
-	private static class JoinEdgesByLabelOnRightSide implements FlatJoinFunction<ArrayList<Long>,
+	private static class JoinOutEdgesByLabel implements FlatJoinFunction<ArrayList<Long>,
 			EdgeExtended<Long, Long, String, HashMap<String, String>>, ArrayList<Long>> {
 		
 		private String label;
-		public JoinEdgesByLabelOnRightSide(String label) { this.label = label; }
+		public JoinOutEdgesByLabel(String label) { this.label = label; }
 		@Override
 		public void join(
 				ArrayList<Long> vertexAndEdgeIds,
@@ -330,22 +349,22 @@ public class UnaryOperators {
 	}
 	
 	//Select edges By Label on left side
-		public DataSet<ArrayList<Long>> selectEdgesByLabelOnLeftSide(int col, String label){
+		public DataSet<ArrayList<Long>> selectInEdgesByLabel(int col, String label, JoinHint strategy){
 			KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 			DataSet<ArrayList<Long>> selectedResults = paths
-					.join(graph.getEdges())
+					.join(graph.getEdges(), strategy)
 					.where(verticesSelector)
 					.equalTo(2)
-					.with(new JoinEdgesByLabelOnLeftSide(label));
+					.with(new JoinInEdgesByLabel(label));
 			this.paths = selectedResults;
 			return selectedResults;
 		}
 		
-		private static class JoinEdgesByLabelOnLeftSide implements FlatJoinFunction<ArrayList<Long>,
+		private static class JoinInEdgesByLabel implements FlatJoinFunction<ArrayList<Long>,
 				EdgeExtended<Long, Long, String, HashMap<String, String>>, ArrayList<Long>> {
 			
 			private String label;
-			public JoinEdgesByLabelOnLeftSide(String label) { this.label = label; }
+			public JoinInEdgesByLabel(String label) { this.label = label; }
 			@Override
 			public void join(
 					ArrayList<Long> vertexAndEdgeIds,
@@ -361,10 +380,10 @@ public class UnaryOperators {
 		}
 	
 	//Select edges not including the label 
-	public DataSet<ArrayList<Long>> selectReverseEdgesByLabel(int col, String label){
+	public DataSet<ArrayList<Long>> selectReverseEdgesByLabel(int col, String label, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(1)
 				.with(new JoinAndFilterReverseEdgesByLabel(label));
@@ -392,21 +411,21 @@ public class UnaryOperators {
 	}
 	
 	//Select edges by their properties on right side
-	public DataSet<ArrayList<Long>> selectEdgesByPropertiesOnRightSide(int col, HashMap<String, String> props){
+	public DataSet<ArrayList<Long>> selectOutEdgesByProperties(int col, HashMap<String, String> props, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(1)
-				.with(new JoinEdgesByPropertiesOnRightSide(props));
+				.with(new JoinOutEdgesByProperties(props));
 		this.paths = selectedResults;
 		return selectedResults;
 	}
 	
-	private static class JoinEdgesByPropertiesOnRightSide implements FlatJoinFunction<ArrayList<Long>,
+	private static class JoinOutEdgesByProperties implements FlatJoinFunction<ArrayList<Long>,
 			EdgeExtended<Long, Long, String, HashMap<String, String>>, ArrayList<Long>> {
 		private HashMap<String, String> props;
-		public JoinEdgesByPropertiesOnRightSide(HashMap<String, String> properties) { this.props = properties; }
+		public JoinOutEdgesByProperties(HashMap<String, String> properties) { this.props = properties; }
 		@Override
 		public void join(
 				ArrayList<Long> vertexAndEdgeIds,
@@ -427,21 +446,21 @@ public class UnaryOperators {
 	}
 	
 	//Select edges by their properties on left side
-	public DataSet<ArrayList<Long>> selectEdgesByPropertiesOnLeftSide(int col, HashMap<String, String> props){
+	public DataSet<ArrayList<Long>> selectInEdgesByProperties(int col, HashMap<String, String> props, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(2)
-				.with(new JoinEdgesByPropertiesOnLeftSide(props));
+				.with(new JoinInEdgesByProperties(props));
 		this.paths = selectedResults;
 		return selectedResults;
 	}
 		
-	private static class JoinEdgesByPropertiesOnLeftSide implements FlatJoinFunction<ArrayList<Long>,
+	private static class JoinInEdgesByProperties implements FlatJoinFunction<ArrayList<Long>,
 			EdgeExtended<Long, Long, String, HashMap<String, String>>, ArrayList<Long>> {
 		private HashMap<String, String> props;
-		public JoinEdgesByPropertiesOnLeftSide(HashMap<String, String> properties) { this.props = properties; }
+		public JoinInEdgesByProperties(HashMap<String, String> properties) { this.props = properties; }
 		@Override
 		public void join(
 				ArrayList<Long> vertexAndEdgeIds,
@@ -462,10 +481,10 @@ public class UnaryOperators {
 	}	
 	
 	//Select edges not including the properties
-	public DataSet<ArrayList<Long>> selectReverseEdgesByProperties(int col, HashMap<String, String> props) {
+	public DataSet<ArrayList<Long>> selectReverseEdgesByProperties(int col, HashMap<String, String> props, JoinHint strategy) {
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
-				.join(graph.getEdges())
+				.join(graph.getEdges(), strategy)
 				.where(verticesSelector)
 				.equalTo(1)
 				.with(new JoinAndFilterReverseEdgesByProperties(props));
@@ -495,6 +514,36 @@ public class UnaryOperators {
 				}
 			}
 		}
+	}
+	
+	//select outgoing edges by boolean expressions 
+	public DataSet<ArrayList<Long>> selectOutEdgesByBooleanExpressions(int col, 
+	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges){
+		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
+		DataSet<ArrayList<Long>> selectedResults = paths
+			//Join with the vertices in the input graph then filter these vertices based on properties
+			.join(graph.getEdges())
+			.where(edgesSelector)
+			.equalTo(1)
+			.with(new FilterEdgesByBooleanExpressions(filterEdges));
+
+		this.paths = selectedResults;
+		return selectedResults;
+	}
+
+	//select ingoing edges by boolean expressions 
+	public DataSet<ArrayList<Long>> selectInEdgesByBooleanExpressions(int col, 
+	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges){
+		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
+		DataSet<ArrayList<Long>> selectedResults = paths
+			//Join with the vertices in the input graph then filter these vertices based on properties
+			.join(graph.getEdges())
+			.where(edgesSelector)
+			.equalTo(2)
+			.with(new FilterEdgesByBooleanExpressions(filterEdges));
+
+		this.paths = selectedResults;
+		return selectedResults;
 	}
 	
 	//return all vertices specified by their IDs in a column
@@ -554,7 +603,6 @@ public class UnaryOperators {
 			return new Tuple1<Long>(edge.get(this.column));			
 		}
 	}
-	
 	
 	private static class ProjectSelectedEdges implements JoinFunction<Tuple1<Long>,
 		EdgeExtended<Long, Long, String, HashMap<String, String>>, EdgeExtended<Long, Long, String, HashMap<String, String>>> {

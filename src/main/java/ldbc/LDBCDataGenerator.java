@@ -14,7 +14,7 @@ public class LDBCDataGenerator {
 	public static void main(String[] args) throws Exception {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 	
-		String dir = "C:/Users/s146508/Desktop/ubuntu/social_network/";
+		String dir = "C:/Users/s146508/Desktop/ubuntu/35kPerson/";
 		LDBCToGraphDataModel ldbcGraph = new LDBCToGraphDataModel(dir, env);
 		ldbcGraph.getGraph();
 	

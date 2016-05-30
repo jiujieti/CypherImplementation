@@ -6,7 +6,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 public class OR <T> implements FilterFunction<T> {
 	private FilterFunction<T> lhs, rhs;
   
-	OR(FilterFunction<T> l, FilterFunction<T> r) {
+	public OR(FilterFunction<T> l, FilterFunction<T> r) {
 		this.lhs = l; 
 		this.rhs = r;
     }

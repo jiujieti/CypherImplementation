@@ -6,7 +6,7 @@ import org.apache.flink.api.common.functions.FilterFunction;
 public class XOR<T> implements FilterFunction<T> {
 	private FilterFunction<T> lhs, rhs;
   
-	XOR(FilterFunction<T> l, FilterFunction<T> r) {
+	public XOR(FilterFunction<T> l, FilterFunction<T> r) {
 		this.lhs = l; 
 		this.rhs = r;
     }

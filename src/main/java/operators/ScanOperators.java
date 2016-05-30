@@ -101,26 +101,37 @@ public class ScanOperators {
 		return vertexIds;
 	}
 		
-		private static class FilterVerticesByProperties implements FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
-		    HashMap<String, String> properties;
-			
-			public FilterVerticesByProperties (HashMap<String, String> properties) {this.properties = properties;}
-
-			@Override
-			public boolean filter(
-					VertexExtended<Long, HashSet<String>, HashMap<String, String>> vertex)
-					throws Exception {
-				for(Map.Entry<String, String> propInQuery : this.properties.entrySet()) {
-					//If the vertex does not contain the specific key
-					if(vertex.getProps().get(propInQuery.getKey()) == null || 
-							//If the key is contained, check if the value is consistent or not
-						!vertex.getProps().get(propInQuery.getKey()).equals(propInQuery.getValue())) {
-						return false;
-					}
+	private static class FilterVerticesByProperties implements FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
+	    HashMap<String, String> properties;
+		
+		public FilterVerticesByProperties (HashMap<String, String> properties) {this.properties = properties;}
+		@Override
+		
+		public boolean filter(
+				VertexExtended<Long, HashSet<String>, HashMap<String, String>> vertex)
+				throws Exception {
+			for(Map.Entry<String, String> propInQuery : this.properties.entrySet()) {
+				//If the vertex does not contain the specific key
+				if(vertex.getProps().get(propInQuery.getKey()) == null || 
+						//If the key is contained, check if the value is consistent or not
+					!vertex.getProps().get(propInQuery.getKey()).equals(propInQuery.getValue())) {
+					return false;
 				}
-				return true;
-			}	
-		}
+			}
+			return true;
+		}	
+	}
+	
+	public DataSet<ArrayList<Long>> getInitialVerticesByBooleanExpressions(
+			FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> filterVertices){
+		
+		DataSet<ArrayList<Long>> vertexIds = graph
+				.getVertices()
+				.filter(filterVertices)
+				.map(new InitialVerticesToLists());
+		return vertexIds; 
+	}
+	
 }
 	
 	
