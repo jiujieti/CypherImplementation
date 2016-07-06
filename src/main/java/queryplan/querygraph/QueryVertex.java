@@ -1,5 +1,11 @@
 package queryplan.querygraph;
 
+import java.util.HashMap;
+
+
+import org.apache.flink.api.java.tuple.Tuple2;
+
+
 //import java.util.ArrayList;
 
 /**
@@ -8,14 +14,27 @@ package queryplan.querygraph;
  *  */
 public class QueryVertex {
 	String label;
+	HashMap<String, Tuple2<String, Double>> props;
 	QueryGraphComponent component;
+	double priority = 0;
 	
-	public QueryVertex(String s) {
+	public QueryVertex(String s, HashMap<String, Tuple2<String, Double>> ps) {
 		label = s;
+		props = ps;
+		if(!s.equals("")) {
+			priority += 0.7;
+		}
+		if(!props.isEmpty()) {
+			priority += props.size();
+		}
 	}
 	
 	public String getLabel() {
 		return label;
+	}
+	
+	public HashMap<String, Tuple2<String, Double>> getProps() {
+		return props;
 	}
 	
 	public QueryGraphComponent getComponent() {
@@ -24,5 +43,9 @@ public class QueryVertex {
 	
 	public void setComponent(QueryGraphComponent qgc) {
 		component = qgc;
+	}
+
+	public double getPrio() {
+		return priority;
 	}
 }

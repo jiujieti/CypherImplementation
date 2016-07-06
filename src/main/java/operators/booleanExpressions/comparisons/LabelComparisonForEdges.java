@@ -11,12 +11,12 @@ public class LabelComparisonForEdges implements FilterFunction<EdgeExtended<Long
 
 	private String label;
 	
-	LabelComparisonForEdges(String label) {this.label = label;}
+	public LabelComparisonForEdges(String label) {this.label = label;}
 	@Override
 	public boolean filter(
 			EdgeExtended<Long, Long, String, HashMap<String, String>> edge)
 			throws Exception {
-		if(edge.f3.equals(this.label)) return true;
+		if(edge.f3.equals(this.label) || label.equals("")) return true;
 		else return false;
 	}
 

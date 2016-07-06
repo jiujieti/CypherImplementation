@@ -15,6 +15,7 @@ import operators.datastructures.VertexExtended;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 
@@ -41,14 +42,15 @@ public class QueryPlanGeneratorTest {
 		
 		GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromDataSet(vertices, edges, env);
-		QueryVertex a = new QueryVertex("post");
-		QueryVertex b = new QueryVertex("person");
-		QueryVertex c = new QueryVertex("comment");
+		QueryVertex a = new QueryVertex("post",  new HashMap<String, Tuple2<String, Double>>());
+		QueryVertex b = new QueryVertex("person",  new HashMap<String, Tuple2<String, Double>>());
+		QueryVertex c = new QueryVertex("comment",  new HashMap<String, Tuple2<String, Double>>());
 		
 		// a -> b
-		QueryEdge ab = new QueryEdge(a, b, "hasCreator");
+		
+		QueryEdge ab = new QueryEdge(a, b, "hasCreator", new HashMap<String, Tuple2<String, Double>>());
 		// c -> b
-		QueryEdge cb = new QueryEdge(c, b, "hasCreator");
+		QueryEdge cb = new QueryEdge(c, b, "hasCreator", new HashMap<String, Tuple2<String, Double>>());
 		
 		QueryVertex[] vs = {a, b, c};
 		QueryEdge[] es = {ab, cb};
@@ -56,8 +58,8 @@ public class QueryPlanGeneratorTest {
 		QueryGraph g = new QueryGraph(vs, es);
 		
 		StatisticsTransformation st = new StatisticsTransformation(dir, env); 
-		QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, st.getVerticesStatistics(), st.getEdgesStatistics());
-		pg.generateQueryPlan();
+		QueryPlanner pg = new QueryPlanner(g, graph, st.getVerticesStatistics(), st.getEdgesStatistics());
+		pg.genQueryPlan();
 		//QueryPlanGenerator pg = new QueryPlanGenerator(g);
 		//System.out.println(pg);
 	}

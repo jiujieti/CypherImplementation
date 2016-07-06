@@ -5,7 +5,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
-import operators.booleanExpressions.FilterEdgesByBooleanExpressions;
+import operators.booleanExpressions.FilterInEdgesByBooleanExpressions;
+import operators.booleanExpressions.FilterOutEdgesByBooleanExpressions;
 import operators.booleanExpressions.FilterVerticesByBooleanExpressions;
 import operators.booleanExpressions.comparisons.PropertyComparisonForVertices;
 import operators.datastructures.*;
@@ -166,11 +167,11 @@ public class UnaryOperators {
 	
 	//Select vertices by boolean expressions
 	public DataSet<ArrayList<Long>> selectVerticesByBooleanExpressions(int col, FilterFunction<VertexExtended<Long, HashSet<String>,
-			HashMap<String, String>>> filterVertices){
+			HashMap<String, String>>> filterVertices, JoinHint strategy){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
 			//Join with the vertices in the input graph then filter these vertices based on properties
-			.join(graph.getVertices())
+			.join(graph.getVertices(), strategy)
 			.where(verticesSelector)
 			.equalTo(0)
 			.with(new FilterVerticesByBooleanExpressions(filterVertices));
@@ -520,14 +521,14 @@ public class UnaryOperators {
 	
 	//select outgoing edges by boolean expressions 
 	public DataSet<ArrayList<Long>> selectOutEdgesByBooleanExpressions(int col, 
-	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges){
+	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges, JoinHint strategy){
 		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
 			//Join with the vertices in the input graph then filter these vertices based on properties
-			.join(graph.getEdges())
+			.join(graph.getEdges(), strategy)
 			.where(edgesSelector)
 			.equalTo(1)
-			.with(new FilterEdgesByBooleanExpressions(filterEdges));
+			.with(new FilterOutEdgesByBooleanExpressions(filterEdges));
 
 		this.paths = selectedResults;
 		return selectedResults;
@@ -542,7 +543,7 @@ public class UnaryOperators {
 			.join(graph.getEdges())
 			.where(edgesSelector)
 			.equalTo(2)
-			.with(new FilterEdgesByBooleanExpressions(filterEdges));
+			.with(new FilterInEdgesByBooleanExpressions(filterEdges));
 
 		this.paths = selectedResults;
 		return selectedResults;
