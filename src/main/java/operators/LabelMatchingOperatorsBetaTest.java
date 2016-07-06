@@ -49,7 +49,7 @@ public class LabelMatchingOperatorsBetaTest {
 		//  EdgeExtended<String, Long, String, HashMap<String, String>> e4 =
 			//	  new EdgeExtended<> ("e4", 4L, 1L, el, ep);
 		EdgeExtended<Long, Long, String, HashMap<String, String>> e5 =
-			new EdgeExtended<> (105L, 1L, 3L, el, ep);
+			new EdgeExtended<> (105L, 3L, 1L, el, ep);
 		  
 		List<EdgeExtended<Long, Long, String, HashMap<String, String>>> edgeList = 
 			new ArrayList<>();
@@ -82,7 +82,7 @@ public class LabelMatchingOperatorsBetaTest {
 	    
 	   //s.getInitialVertices().print();
 	    LabelMatchingOperatorsBeta l = new LabelMatchingOperatorsBeta(graph, s.getInitialVertices());
-	    l.matchWithUpperBound(0, 1, "Likes", JoinHint.BROADCAST_HASH_FIRST).print();
+	   // l.matchWithBounds(0, 1, 2, "Likes", JoinHint.BROADCAST_HASH_FIRST).print();
 	   // graph.getEdges().print();
 	}
 

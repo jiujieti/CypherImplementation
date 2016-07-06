@@ -59,6 +59,7 @@ public class ScanOperatorsTest {
       ScanOperators s = new ScanOperators(graph);
       HashSet<String> q1 = new HashSet<>();
       q1.add("User");
+      
       s.getInitialVerticesByLabels(q1).print();
 	}
 }

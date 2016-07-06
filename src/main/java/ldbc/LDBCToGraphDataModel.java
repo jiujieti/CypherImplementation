@@ -1,4 +1,5 @@
 package ldbc;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -15,6 +16,7 @@ import org.apache.flink.api.java.tuple.Tuple4;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.api.java.tuple.Tuple8;
 import org.apache.flink.api.java.tuple.Tuple9;
+import org.apache.flink.core.fs.FileSystem;
 
 
 public class LDBCToGraphDataModel {
@@ -307,6 +309,10 @@ public class LDBCToGraphDataModel {
 				likesCommentMaxId,
 				"likes",
 				"creationDate");
+		
+//		PrintWriter writer = new PrintWriter(dir + "out.txt", "UTF-8");
+	//	writer.println("likesPost.count() == " + likesPost.count());
+		//writer.close();
 
 		DataSet<EdgeExtended<Long, Long, String, HashMap<String, String>>> likesPostMaxId = likesPost.max(0);
 
@@ -408,8 +414,9 @@ public class LDBCToGraphDataModel {
 				.union(isSubclassOf);
 		
 //		GraphExtended<Long, HashSet<String>, HashMap<String, String>, Long, String, HashMap<String, String>> dataGraph = GraphExtended.fromDataSet(vertices, edges, env);
-		edges.writeAsCsv(dir + "edges.csv", "\n", "|");
-		vertices.writeAsCsv(dir + "vertices.csv", "\n", "|");
+		vertices.writeAsCsv(dir + "vertices.csv", "\n", "|", FileSystem.WriteMode.OVERWRITE);
+		edges.writeAsCsv(dir + "edges.csv", "\n", "|", FileSystem.WriteMode.OVERWRITE);
+		
 		env.setParallelism(1);
 		env.execute();
 		//return personWithEmailAndLanguage;

@@ -74,6 +74,8 @@ public class UnaryOperators {
 	}
 
 	
+	
+		
 	//select all vertices not including the label
 	public DataSet<ArrayList<Long>> selectReverseVerticesByLabels(int col, HashSet<String> labs){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);

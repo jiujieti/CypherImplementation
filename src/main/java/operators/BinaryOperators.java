@@ -21,7 +21,7 @@ public class BinaryOperators {
 	}
 	
 	//Join on after vertices
-	public DataSet<ArrayList<Long>> JoinOnAfterVertices(int firstCol, int secondCol) {
+	public DataSet<ArrayList<Long>> joinOnAfterVertices(int firstCol, int secondCol) {
 		KeySelectorForColumns SelectorFisrt = new KeySelectorForColumns(firstCol);
 		KeySelectorForColumns SelectorSecond = new KeySelectorForColumns(secondCol);
 		
@@ -50,7 +50,7 @@ public class BinaryOperators {
 
 	
 	//Join on left vertices
-	public DataSet<ArrayList<Long>> JoinOnBeforeVertices(int firstCol, int secondCol) {
+	public DataSet<ArrayList<Long>> joinOnBeforeVertices(int firstCol, int secondCol) {
 		KeySelectorForColumns SelectorFisrt = new KeySelectorForColumns(firstCol);
 		KeySelectorForColumns SelectorSecond = new KeySelectorForColumns(secondCol);
 		

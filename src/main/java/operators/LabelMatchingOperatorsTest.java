@@ -84,7 +84,7 @@ public class LabelMatchingOperatorsTest {
     //s.getInitialVertices().print();
     LabelMatchingOperators l = new LabelMatchingOperators(graph, s.getInitialVertices());
  //  l.matchWithoutBounds(0, "Likes").print();
-    l.matchWithBounds(0, 1, 2,"Likes", JoinHint.BROADCAST_HASH_FIRST).print();
+    l.matchWithUpperBound(0, 1, "Likes", JoinHint.BROADCAST_HASH_FIRST).print();
 	//graph.getEdges().print();
 	}
 }
