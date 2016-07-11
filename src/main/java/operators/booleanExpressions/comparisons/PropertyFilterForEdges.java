@@ -12,12 +12,16 @@ public class PropertyFilterForEdges implements FilterFunction<EdgeExtended<Long,
 
 	private String propertyKey;
 	private String op;
-	private double propertyValue;
+	private String propertyValue;
+	private double propertyValueDouble;
 	
-	public PropertyFilterForEdges(String propertyKey, String op, double propertyValue) {
+	public PropertyFilterForEdges(String propertyKey, String op, String propertyValue) {
 		this.propertyKey = propertyKey;
 		this.op = op;
-		this.propertyValue = propertyValue;
+		try {
+			this.propertyValueDouble = Double.parseDouble(propertyValue);
+		} 
+		catch (Exception e) {}
 	}
 	
 	@Override
@@ -27,36 +31,34 @@ public class PropertyFilterForEdges implements FilterFunction<EdgeExtended<Long,
 		if(edge.getProps().get(this.propertyKey) == null) {
 			return false;
 		}
-		else {
-			switch(op) {
-				case ">": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) > this.propertyValue) return true;
-					else return false;	
-				}
-				case "<": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) < this.propertyValue) return true;
-					else return false;	
-				}
-				case "=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) == this.propertyValue) return true;
-					else return false;	
-				}
-				case ">=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) >= this.propertyValue) return true;
-					else return false;	
-				}
-				case "<=": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) <= this.propertyValue) return true;
-					else return false;		
-				}
-				case "<>": {
-					if(Double.parseDouble(edge.f4.get(this.propertyKey)) != this.propertyValue) return true;
-					else return false;	
-				}
-				default: return false;
+		double ep = 0;
+		try {
+			ep = Double.parseDouble(edge.f4.get(this.propertyKey));
+		}
+		catch(Exception e) {}
+		switch(op) {
+			case ">": {
+				return ep > propertyValueDouble;	
+			}
+			case "<": {
+				return ep < propertyValueDouble;	
+			}
+			case "=": {
+				return ep == propertyValueDouble; 
+			}
+			case ">=": {
+				return ep >= propertyValueDouble; 
+			}
+			case "<=": {
+				return ep <= propertyValueDouble; 
+			}
+			case "<>": {
+				return ep != propertyValueDouble; 
+			}
+			case "eq": {
+				return edge.f4.get(this.propertyKey).equals(propertyValue);
+			}
+			default: return false;
 			}
 		}
-	}
-
-
 }

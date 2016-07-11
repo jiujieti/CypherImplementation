@@ -12,12 +12,17 @@ public class PropertyFilterForVertices implements FilterFunction<VertexExtended<
 	
 	private String propertyKey;
 	private String op;
-	private double propertyValue;
+	private String propertyValue;
+	private double propertyValueDouble; 
 	
-	public PropertyFilterForVertices(String propertyKey, String op, double propertyValue) {
+	public PropertyFilterForVertices(String propertyKey, String op, String propertyValue) {
 		this.propertyKey = propertyKey;
 		this.op = op;
 		this.propertyValue = propertyValue;
+		try {
+			this.propertyValueDouble = Double.parseDouble(propertyValue);
+		} 
+		catch (Exception e) {}
 	}
 	
 	@Override
@@ -27,35 +32,34 @@ public class PropertyFilterForVertices implements FilterFunction<VertexExtended<
 		if(vertex.getProps().get(this.propertyKey) == null) {
 			return false;
 		}
-		else {
-			switch(op) {
-				case ">": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) > this.propertyValue) return true;
-					else return false;	
-				}
-				case "<": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) < this.propertyValue) return true;
-					else return false;	
-				}
-				case "=": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) == this.propertyValue) return true;
-					else return false;	
-				}
-				case ">=": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) >= this.propertyValue) return true;
-					else return false;
-				}
-				case "<=": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) <= this.propertyValue) return true;
-					else return false;	
-				}
-				case "<>": {
-					if(Double.parseDouble(vertex.f2.get(this.propertyKey)) != this.propertyValue) return true;
-					else return false;	
-				}
-				default: return false;
+		double vp = 0;
+		try {
+			vp = Double.parseDouble(vertex.f2.get(this.propertyKey));
+		}
+		catch(Exception e) {}
+		switch(op) {
+			case ">": {
+				return vp > propertyValueDouble;	
 			}
+			case "<": {
+				return vp < propertyValueDouble;
+			}
+			case "=": {
+				return vp == propertyValueDouble;
+			}
+			case ">=": {
+				return vp >= propertyValueDouble;
+			}
+			case "<=": {
+				return vp <= propertyValueDouble;
+			}
+			case "<>": {
+				return vp != propertyValueDouble;
+			}
+			case "eq": {
+				return vertex.f2.get(this.propertyKey).equals(propertyValue);
+			}
+			default: throw new Exception("Bad operator " + op + " !");
 		}
 	}
-
 }

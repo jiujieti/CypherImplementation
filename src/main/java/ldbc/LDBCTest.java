@@ -16,10 +16,13 @@ import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
 
+import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
+import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 //import org.apache.flink.configuration.ConfigConstants;
@@ -241,7 +244,7 @@ public class LDBCTest {
 			    unaryOps.selectOutEdgesByLabel(0, "likes", JoinHint.BROADCAST_HASH_FIRST);
 	
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
-			    (new LabelComparisonForVertices("comment"), new PropertyFilterForVertices("length", ">", 50));
+			    (new LabelComparisonForVertices("comment"), new PropertyFilterForVertices("length", ">", "50"));
 			    
 			    unaryOps.selectVerticesByBooleanExpressions(2, q2, JoinHint.BROADCAST_HASH_FIRST);
 			    unaryOps.projectDistinctVertices(2).writeAsText(args[2], WriteMode.OVERWRITE);
@@ -265,7 +268,7 @@ public class LDBCTest {
 			    HashMap<String, String> props = new HashMap<>();
 			    props.put("browserUsed", "Chrome");
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new AND<>
-			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", 50));
+			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", "50"));
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q3 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
 			    (new LabelComparisonForVertices("comment"), q2);
 			    
@@ -292,7 +295,7 @@ public class LDBCTest {
 			    HashMap<String, String> props = new HashMap<>();
 			    props.put("browserUsed", "Chrome");
 			    OR<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new OR<>
-			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", 50));
+			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", "50"));
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q3 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
 			    (new LabelComparisonForVertices("comment"), q2);
 			    
@@ -312,7 +315,7 @@ public class LDBCTest {
 			    HashMap<String, String> props = new HashMap<>();
 			    props.put("browserUsed", "Chrome");
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q1 = new AND<>
-			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", 50));
+			    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", "50"));
 			    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
 			    (new LabelComparisonForVertices("comment"), q1);
 			    
@@ -467,21 +470,43 @@ public class LDBCTest {
 				break;
 				
 			}
+			case "14": {
+				ScanOperators scanOps1 = new ScanOperators(graph);
+				/*FilterFunction vf;
+				vf = new LabelComparisonForVertices("comment");
+				DataSet<ArrayList<Long>> p = scanOps1.getInitialVerticesByBooleanExpressions(vf);
+				//p.print();
+				UnaryOperators u = new UnaryOperators(graph, p);
+				u.projectDistinctVertices(0).sortPartition(0, Order.ASCENDING).first(100).map(new Test()).print();
+				*/
+				FilterFunction vf;
+				FilterFunction newvf;
+				vf = new LabelComparisonForVertices("comment");
+				newvf =  new PropertyFilterForVertices("length", ">", "200.0");
+				vf = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>(vf, newvf);
+				long c = scanOps1.getInitialVerticesByBooleanExpressions(vf).count();
+				System.out.println("HAHA " + c);
+				break;
+				
+
+			}
 		}
-		
-		
-		
-	/*	ScanOperators scanOpsOps = new ScanOperators(graph);
-		HashSet<String> q3 = new HashSet<>();
-	    q3.add("comment");
-	    DataSet<ArrayList<Long>> paths = scanOpsOps.getInitialVerticesByLabels(q3);
-		System.out.println(graph.getAllVertexIds().count());*/
-		
-		
 	
 	    
 	}
 		
+	private static class Test implements MapFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>, String> {
+
+		@Override
+		public String map(
+				VertexExtended<Long, HashSet<String>, HashMap<String, String>> value)
+				throws Exception {
+			if(value.f2.get("length") != null)
+			return value.f2.get("length");
+			return "NONONONONO";
+		}
+		
+	}
 	
 	private static class VerticesFromFileToDataSet implements MapFunction<Tuple3<Long, String, String>, VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
 
@@ -500,29 +525,22 @@ public class LDBCTest {
 			}
 			vertex.setLabels(labels);
 			
-			
 			HashMap<String, String> properties = new HashMap<>();
-			String pattern = "[^=]+=([^= ]*( |$))*";
-			Pattern r = Pattern.compile(pattern);
-			Matcher m = r.matcher(vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1));
-			while(m.find()) {
-				String[] keyAndValue = m.group(0).split("=");
-				if(keyAndValue.length >= 2){
-					String key = keyAndValue[0];
-					String value = keyAndValue[1];
-					if(value.length() >= 2){
-						if(value.substring(value.length() - 2, value.length()).equals(", ")){
-							properties.put(key, value.substring(0, value.length() - 2));
-						}
-						else{
-							properties.put(key, value);
-						}
+			String propString = vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1);
+			String[] fields = propString.split(", ");
+			String lastk = null;
+			for (String f: fields) {
+				String[] kv = f.split("=", 2);
+				if (kv.length == 1) {
+					// Continuation of last field
+					if (lastk == null) {
+						throw new Exception("bad property string " + propString);
 					}
-				}
-				else {
-					String key = keyAndValue[0];
-					String value = "";
-					properties.put(key, value);
+					properties.put(lastk, properties.get(lastk) + ", " + kv[0]);
+				} else {
+					// New field
+					properties.put(kv[0], kv[1]);
+					lastk = kv[0];
 				}
 			}
 			vertex.setProps(properties);

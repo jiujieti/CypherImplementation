@@ -536,11 +536,11 @@ public class UnaryOperators {
 
 	//select ingoing edges by boolean expressions 
 	public DataSet<ArrayList<Long>> selectInEdgesByBooleanExpressions(int col, 
-	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges){
+	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges, JoinHint strategy){
 		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
 			//Join with the vertices in the input graph then filter these vertices based on properties
-			.join(graph.getEdges())
+			.join(graph.getEdges(), strategy)
 			.where(edgesSelector)
 			.equalTo(2)
 			.with(new FilterInEdgesByBooleanExpressions(filterEdges));

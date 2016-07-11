@@ -17,7 +17,7 @@ import operators.BinaryOperators;
 import operators.datastructures.*;
 
 @SuppressWarnings("unchecked")
-
+/*A query plan generator which only utilizes the statistics */
 public class QueryPlanGenerator {
 	QueryGraph query;
 	GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
@@ -120,17 +120,7 @@ public class QueryPlanGenerator {
 			}
 		}
 		query.getQueryVertices()[0].getComponent().getData().count();
-		/*
-		for (Object o: query.getQueryVertices()[0].getComponent().getColumns()) {
-			if (o.getClass() == QueryVertex.class) {
-				QueryVertex qv = (QueryVertex) o;
-				System.out.println(qv.getLabel());
-			} else {
-				QueryEdge qe = (QueryEdge) o;
-				System.out.println(qe.getLabel());
-			}
-		}
-		*/
+	
 	}
 	
 

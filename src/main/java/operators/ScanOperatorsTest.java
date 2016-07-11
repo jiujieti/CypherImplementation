@@ -5,11 +5,17 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
+import operators.booleanExpressions.AND;
+import operators.booleanExpressions.comparisons.LabelComparisonForVertices;
+import operators.booleanExpressions.comparisons.PropertyFilterForVertices;
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
 
+import org.apache.flink.api.common.functions.FilterFunction;
+import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
+import org.apache.flink.api.java.tuple.Tuple2;
 
 public class ScanOperatorsTest {
   public static void main(String[] args) throws Exception {
@@ -21,7 +27,7 @@ public class ScanOperatorsTest {
 	  vp1.put("age", "48");
 	  HashMap<String, String> vp2 = new HashMap<>();
 	  vp2.put("name", "Alice");
-	  vp2.put("age", "4");
+	  vp2.put("age", "48");
 	  vp2.put("gender", "female");
 	  HashMap<String, String> ep1 = new HashMap<>();
 	  ep1.put("time", "2016");
@@ -53,13 +59,13 @@ public class ScanOperatorsTest {
       GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
       Long, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 	  
-      graph.getVertices().print();
-      graph.getEdges().print();
-      
+  
       ScanOperators s = new ScanOperators(graph);
-      HashSet<String> q1 = new HashSet<>();
-      q1.add("User");
-      
-      s.getInitialVerticesByLabels(q1).print();
+  
+      FilterFunction vf;
+      vf = new LabelComparisonForVertices("User");
+      PropertyFilterForVertices newvf =  new PropertyFilterForVertices("age", "<", "48.5");
+      vf = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>(vf, newvf);
+      s.getInitialVerticesByBooleanExpressions(vf).print();
 	}
 }

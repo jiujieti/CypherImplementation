@@ -12,6 +12,7 @@ import operators.booleanExpressions.AND;
 import operators.booleanExpressions.comparisons.LabelComparisonForEdges;
 import operators.booleanExpressions.comparisons.LabelComparisonForVertices;
  
+import operators.booleanExpressions.comparisons.PropertyFilterForEdges;
 import operators.booleanExpressions.comparisons.PropertyFilterForVertices;
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
@@ -28,24 +29,34 @@ import queryplan.querygraph.QueryGraphComponent;
 import queryplan.querygraph.QueryVertex;
 @SuppressWarnings("unchecked")
 public class QueryPlanner {
+	
 	QueryGraph query;
+	
 	GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
     	Long, String, HashMap<String, String>> graph;
-	HashMap<String, Tuple2<Long, Double>> verticesStats;
-	HashMap<String, Tuple2<Long, Double>> edgesStats;
 	
-	public QueryPlanner(QueryGraph q, GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
+//	HashMap<String, Tuple2<Long, Double>> verticesStats;
+	
+//	HashMap<String, Tuple2<Long, Double>> edgesStats;
+	
+/*	public QueryPlanner(QueryGraph q, GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 		      Long, String, HashMap<String, String>> g, HashMap<String, Tuple2<Long, Double>> vs,
 		      HashMap<String, Tuple2<Long, Double>> es) {
 		query = q;
 		graph = g;
 		verticesStats = vs;
 		edgesStats = es;
+	}*/
+	
+	public QueryPlanner(QueryGraph q, GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
+		      Long, String, HashMap<String, String>> g) {
+		query = q;
+		graph = g;
 	}
 	
-	public void genQueryPlan() throws Exception {
+	public DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> genQueryPlan() throws Exception {
 		//traverse each query vertex and generate a initial component
-		for(QueryVertex qv: query.getQueryVertices()){
+		for(QueryVertex qv: query.getQueryVertices()) {
 			double est = qv.getPrio();
 			ScanOperators s = new ScanOperators(graph);
 			
@@ -53,7 +64,7 @@ public class QueryPlanner {
 			FilterFunction newvf;
 			vf = new LabelComparisonForVertices(qv.getLabel());
 			if(!qv.getProps().isEmpty()) {
-				HashMap<String, Tuple2<String, Double>> props = (HashMap<String, Tuple2<String, Double>>) qv.getProps().clone();
+				HashMap<String, Tuple2<String, String>> props = (HashMap<String, Tuple2<String, String>>) qv.getProps().clone();
 				for(String k: props.keySet()){
 					newvf =  new PropertyFilterForVertices(k, props.get(k).f0, props.get(k).f1);
 					vf = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
@@ -61,28 +72,43 @@ public class QueryPlanner {
 				}
 			} 
 			DataSet<ArrayList<Long>> paths = s.getInitialVerticesByBooleanExpressions(vf);
-			
+		//	System.out.println(paths.count() + " WHY " + qv.getLabel());
 			ArrayList<Object> cols = new ArrayList<>();
 			cols.add(qv);
 			qv.setComponent(new QueryGraphComponent(est, paths, cols));
+			
 		}
 		
 		ArrayList<QueryEdge> edges= new ArrayList<> (Arrays.asList(query.getQueryEdges()));
-		
-		//System.out.println("LALALA");
-		
+	
 		while (!edges.isEmpty()) {
-			//traverse statistics, selects the edge with lowest cost
-			double minEst = Double.MAX_VALUE;
+			//heuristic rule 1, selectivity
+			double maxEst = Double.MIN_VALUE;
+			JoinHint strategy;
 			QueryEdge e = edges.get(0);
+			double compEst = 0;
+			
 			for(QueryEdge cand: edges){
 				double estSrc = cand.getSourceVertex().getComponent().getEst();
 				double estTar = cand.getTargetVertex().getComponent().getEst();
 				double estEdge = e.getPrio() + estSrc + estTar;
-				if (minEst > estEdge) {
-					minEst = estEdge;
+				if (maxEst < estEdge) {
+					maxEst = estEdge;
 					e = cand;
 				}
+			}
+			if(maxEst >= 2.5) {
+				//est >= 2.5 contains at least two conditions about property 
+				//works for high selectivity queries
+				strategy = JoinHint.BROADCAST_HASH_FIRST;
+			}
+			else if(maxEst > 1.9) {
+				//est > 1.9 contains at least one condition about property 
+				//works for middle selectivity queries
+				strategy = JoinHint.REPARTITION_HASH_FIRST;
+			}
+			else {
+				strategy = JoinHint.REPARTITION_SORT_MERGE;
 			}
 			edges.remove(e);
 			
@@ -91,19 +117,21 @@ public class QueryPlanner {
 			FilterFunction ef;
 			FilterFunction newef;
 			ef = new LabelComparisonForEdges(e.getLabel());
+			
 			if(!e.getProps().isEmpty()) {
-				HashMap<String, Tuple2<String, Double>> props = (HashMap<String, Tuple2<String, Double>>) e.getProps().clone();
+				HashMap<String, Tuple2<String, String>> props = (HashMap<String, Tuple2<String, String>>) e.getProps().clone();
 				for(String k: props.keySet()){
-					newef =  new PropertyFilterForVertices(k, props.get(k).f0, props.get(k).f1);
+					newef =  new PropertyFilterForEdges(k, props.get(k).f0, props.get(k).f1);
 					ef = new AND<EdgeExtended<Long, Long, String, HashMap<String, String>>>(ef, newef);
 				}
 			} 
-			if(e.getSourceVertex().getComponent().getEst() <= e.getTargetVertex().getComponent().getEst()) {
-				System.out.println("HAHAHAHA " + e.getSourceVertex().getLabel() + " " + e.getLabel() + " " + e.getTargetVertex().getLabel() + " out");
+			
+			if(e.getSourceVertex().getComponent().getEst() >= e.getTargetVertex().getComponent().getEst()) {
+				//System.out.println("LALALA " + e.getSourceVertex().getLabel() + " " + e.getLabel() + " " + e.getTargetVertex().getLabel() + "OUT");
 				UnaryOperators u = new UnaryOperators(graph, e.getSourceVertex().getComponent().getData()) ;
 				int firstCol = e.getSourceVertex().getComponent().getVertexIndex(e.getSourceVertex());
-				//paths = u.selectOutEdgesByLabel(firstCol, e.getLabel(), JoinHint.BROADCAST_HASH_FIRST);
-				paths = u.selectOutEdgesByBooleanExpressions(firstCol, ef, JoinHint.BROADCAST_HASH_SECOND);
+				
+				paths = u.selectOutEdgesByBooleanExpressions(firstCol, ef, strategy);
 				
 				leftColumns = e.getSourceVertex().getComponent().getColumns();
 				
@@ -114,34 +142,35 @@ public class QueryPlanner {
 				rightColumns = (ArrayList<Object>) e.getTargetVertex().getComponent().getColumns().clone();
 				rightColumns.remove(secondCol);
 				rightColumns.add(0, e.getTargetVertex());
+				compEst = e.getSourceVertex().getComponent().getEst();
 			}
+			
 			else {
-				System.out.println("HAHAHAHA " + e.getSourceVertex().getLabel() + " " + e.getLabel() + " " + e.getTargetVertex().getLabel() + " in");
+				//System.out.println("LALALA " + e.getSourceVertex().getLabel() + " " + e.getLabel() + " " + e.getTargetVertex().getLabel() + "IN");
 				UnaryOperators u = new UnaryOperators(graph, e.getTargetVertex().getComponent().getData()) ;
 				int firstCol = e.getTargetVertex().getComponent().getVertexIndex(e.getTargetVertex());
 				//paths = u.selectInEdgesByLabel(firstCol, e.getLabel(), JoinHint.BROADCAST_HASH_FIRST);
-				paths = u.selectOutEdgesByBooleanExpressions(firstCol, ef, JoinHint.BROADCAST_HASH_SECOND);
-				
-				
+				paths = u.selectInEdgesByBooleanExpressions(firstCol, ef, strategy);
+					
 				leftColumns = e.getTargetVertex().getComponent().getColumns();
 				
 				BinaryOperators b = new BinaryOperators(paths, e.getSourceVertex().getComponent().getData());
 				int secondCol = e.getSourceVertex().getComponent().getVertexIndex(e.getSourceVertex());
-				joinedPaths = b.joinOnAfterVertices(leftColumns.size()+1, secondCol);
+				joinedPaths = b.joinOnAfterVertices(leftColumns.size() + 1, secondCol);
 				
 				rightColumns = (ArrayList<Object>) e.getSourceVertex().getComponent().getColumns().clone();
 				rightColumns.remove(secondCol);
 				rightColumns.add(0, e.getSourceVertex());
+				compEst = e.getTargetVertex().getComponent().getEst();
+				//System.out.println("TAT " + e.getTargetVertex().getComponent().getData().count());
+						
 			}
 			ArrayList<Object> columns = new ArrayList<>();
 			columns.addAll(leftColumns);
 			columns.add(e);
 			columns.addAll(rightColumns);
 
-			//System.out.println("HAHAHA " + paths.count() + ", " + joinedPaths.count());
-
-			double est = minEst / verticesStats.get("vertices").f0;
-			//DataSet<Long> est =  e.getSourceVertex().getComponent().getData().map(new CountDataSize()).aggregate(Aggregations.SUM, 0);
+			double est = compEst;
 			QueryGraphComponent gc = new QueryGraphComponent(est, joinedPaths, columns);
 			
 			for(Object o: columns) { 
@@ -151,19 +180,15 @@ public class QueryPlanner {
 				}
 			}
 		}
-		query.getQueryVertices()[0].getComponent().getData().count();
-		/*
-		for (Object o: query.getQueryVertices()[0].getComponent().getColumns()) {
-			if (o.getClass() == QueryVertex.class) {
-				QueryVertex qv = (QueryVertex) o;
-				System.out.println(qv.getLabel());
-			} else {
-				QueryEdge qe = (QueryEdge) o;
-				System.out.println(qe.getLabel());
+		//where to collect outputs
+		for(QueryVertex qv: query.getQueryVertices()) {
+			if(qv.isOutput()) {
+				UnaryOperators u = new UnaryOperators(graph, qv.getComponent().getData());
+				return u.projectDistinctVertices(qv.getComponent().getVertexIndex(qv));					
 			}
 		}
-		*/
+		return null;
 	}
 	
-
+	
 }

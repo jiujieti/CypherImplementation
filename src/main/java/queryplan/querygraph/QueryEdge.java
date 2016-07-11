@@ -8,12 +8,13 @@ import org.apache.flink.api.java.tuple.Tuple2;
  * A query edge consists of a label and a target vertex
  *  */
 public class QueryEdge {
-	QueryVertex from, to;
-	String label;
-	HashMap<String, Tuple2<String, Double>> props;
-	double priority;
+	private QueryVertex from, to;
+	private String label;
+	private HashMap<String, Tuple2<String, String>> props;
+	private double priority;
 	
-	public QueryEdge(QueryVertex f, QueryVertex t, String l, HashMap<String, Tuple2<String, Double>> ps) {
+	
+	public QueryEdge(QueryVertex f, QueryVertex t, String l, HashMap<String, Tuple2<String, String>> ps) {
 		from = f;
 		to = t;
 		label = l;
@@ -38,7 +39,7 @@ public class QueryEdge {
 		return label;
 	}
 	
-	public HashMap<String, Tuple2<String, Double>> getProps() {
+	public HashMap<String, Tuple2<String, String>> getProps() {
 		return props;
 	}
 	
