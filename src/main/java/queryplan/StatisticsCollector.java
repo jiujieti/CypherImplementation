@@ -21,11 +21,11 @@ public class StatisticsCollector {
 		
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
 		env.setParallelism(1);
-		//String srcDir = args[0];
-		//String tarDir = args[1];
+		String srcDir = args[0];
+		String tarDir = args[1];
 		//String srcDir = "C:/Users/s146508/Desktop/ubuntu/5kPerson/";
-		String srcDir = "C:/Users/s146508/Desktop/ubuntu/a/";
-		String tarDir = srcDir;
+		//String srcDir = "C:/Users/s146508/Desktop/ubuntu/a/";
+		//String tarDir = srcDir;
 		StatisticsCollector k = new StatisticsCollector(env, srcDir, tarDir);
 		k.getEdgesStats();
 		k.getVerticesStats();

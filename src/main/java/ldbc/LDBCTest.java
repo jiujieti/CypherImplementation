@@ -235,7 +235,7 @@ public class LDBCTest {
 			case "5": {
 				//MATCH (m:person) - [:likes] - (n:comment)
 				//WHERE n.length > `50'
-				//RETURN n
+				//RETURN m
 				ScanOperators scanOps = new ScanOperators(graph);
 			    HashSet<String> q1 = new HashSet<>();
 			    q1.add("person");

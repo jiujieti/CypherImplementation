@@ -102,7 +102,7 @@ public class QueryPlanner {
 				//works for high selectivity queries
 				strategy = JoinHint.BROADCAST_HASH_FIRST;
 			}
-			else if(maxEst > 1.9) {
+			else if(maxEst >= 1.9) {
 				//est > 1.9 contains at least one condition about property 
 				//works for middle selectivity queries
 				strategy = JoinHint.REPARTITION_HASH_FIRST;

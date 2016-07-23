@@ -2,8 +2,6 @@ package queryplan;
 
 import java.util.HashMap;
 import java.util.HashSet;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
 
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
@@ -17,9 +15,15 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 
-import queryplan.querygraph.*;
+
+
+
+import queryplan.querygraph.QueryEdge;
+import queryplan.querygraph.QueryGraph;
+import queryplan.querygraph.QueryVertex;
 @SuppressWarnings("serial")
-public class QueryPlanGeneratorTest {
+public class QueryGeneratorTest {
+	
 	public static void main(String[] args) throws Exception {
 		
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -35,12 +39,16 @@ public class QueryPlanGeneratorTest {
 				.fieldDelimiter("|")
 				.types(Long.class, Long.class, Long.class, String.class, String.class);
 		
+		
 		DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> vertices 
 			= verticesFromFile.map(new VerticesFromFileToDataSet());
 		
 		DataSet<EdgeExtended<Long, Long, String, HashMap<String, String>>> edges
 			= edgesFromFile.map(new EdgesFromFileToDataSet());
 		
+		StatisticsTransformation sts = new StatisticsTransformation(dir, env);
+		HashMap<String, Tuple2<Long, Double>> vstat = sts.getVerticesStatistics();
+		HashMap<String, Tuple2<Long, Double>> estat = sts.getEdgesStatistics();
 		GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromDataSet(vertices, edges, env);
 				
@@ -68,8 +76,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);	
 				env.execute();
 				break;
@@ -97,8 +105,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -126,9 +134,9 @@ public class QueryPlanGeneratorTest {
 				QueryEdge[] es = {ab, cb, cd};
 				
 				QueryGraph g = new QueryGraph(vs, es);
-				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -158,8 +166,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -193,8 +201,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -227,9 +235,8 @@ public class QueryPlanGeneratorTest {
 				QueryEdge[] es = {ab, cb, bd, be};
 				
 				QueryGraph g = new QueryGraph(vs, es);
-				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -266,8 +273,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -304,8 +311,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -342,8 +349,8 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -420,6 +427,7 @@ public class QueryPlanGeneratorTest {
 		
 	}
 	 //[^=]+=([^= ]*( |$))* 
+	
 	
 	private static class EdgesFromFileToDataSet implements MapFunction<Tuple5<Long, Long, Long, String, String>, 
 						EdgeExtended<Long, Long, String, HashMap<String, String>>> {
