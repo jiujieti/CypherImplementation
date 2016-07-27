@@ -44,8 +44,8 @@ public class LDBCTest {
 		//final ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment(conf);
 		//env.setParallelism(Integer.parseInt(args[0]));
 	
-		String dir = args[0];
-		//String dir = "C:/Users/s146508/Desktop/ubuntu/5kPerson/";
+		//String dir = args[0];
+		String dir = "C:/Users/s146508/Desktop/ubuntu/5kPerson/";
 		DataSet<Tuple3<Long, String, String>> verticesFromFile = env.readCsvFile(dir + "vertices.csv")
 				.fieldDelimiter("|")
 				.types(Long.class, String.class, String.class);
@@ -472,21 +472,7 @@ public class LDBCTest {
 			}
 			case "14": {
 				ScanOperators scanOps1 = new ScanOperators(graph);
-				/*FilterFunction vf;
-				vf = new LabelComparisonForVertices("comment");
-				DataSet<ArrayList<Long>> p = scanOps1.getInitialVerticesByBooleanExpressions(vf);
-				//p.print();
-				UnaryOperators u = new UnaryOperators(graph, p);
-				u.projectDistinctVertices(0).sortPartition(0, Order.ASCENDING).first(100).map(new Test()).print();
-				*/
-				FilterFunction vf;
-				FilterFunction newvf;
-				vf = new LabelComparisonForVertices("comment");
-				newvf =  new PropertyFilterForVertices("length", ">", "200.0");
-				vf = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>(vf, newvf);
-				long c = scanOps1.getInitialVerticesByBooleanExpressions(vf).count();
-				System.out.println("HAHA " + c);
-				break;
+				
 				
 
 			}
@@ -495,18 +481,6 @@ public class LDBCTest {
 	    
 	}
 		
-	private static class Test implements MapFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>, String> {
-
-		@Override
-		public String map(
-				VertexExtended<Long, HashSet<String>, HashMap<String, String>> value)
-				throws Exception {
-			if(value.f2.get("length") != null)
-			return value.f2.get("length");
-			return "NONONONONO";
-		}
-		
-	}
 	
 	private static class VerticesFromFileToDataSet implements MapFunction<Tuple3<Long, String, String>, VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
 

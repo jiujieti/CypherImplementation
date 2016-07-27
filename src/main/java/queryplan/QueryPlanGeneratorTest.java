@@ -349,7 +349,200 @@ public class QueryPlanGeneratorTest {
 				break;
 				
 			}
-
+			
+			case "9" : {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein) - [:EncodedOn] -> (c:Gene) 
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Gene", new HashMap<String, Tuple2<String, String>>(), false);
+				
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bc = new QueryEdge(b, c, "EncodedOn", new HashMap<String, Tuple2<String, String>>());
+				
+				
+				QueryVertex[] vs = {a, b, c};
+				QueryEdge[] es = {ab, bc};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+				
+			}
+			case "10": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein) - [:Reference] -> (c:Article) - [:PublishedIn] -> (d:Journal) 
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Journal", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bc = new QueryEdge(b, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge cd = new QueryEdge(c, d, "PublishedIn", new HashMap<String, Tuple2<String, String>>());
+				
+				
+				QueryVertex[] vs = {a, b, c, d};
+				QueryEdge[] es = {ab, bc, cd};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
+			case "11": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein) - [:Reference] -> (c:Article) - [:PublishedIn] -> (d:Journal) 
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Journal", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bc = new QueryEdge(b, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge cd = new QueryEdge(c, d, "PublishedIn", new HashMap<String, Tuple2<String, String>>());
+				
+				
+				QueryVertex[] vs = {a, b, c, d};
+				QueryEdge[] es = {ab, bc, cd};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
+			case "12": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein)  
+				//WHERE (a) - [:Reference] -> (c:Article) AND
+				//		(a) - [:EncodedOn] -> (d:Gene)    AND
+				//		(a) - [:HasKeyword] -> (e:Keyword) 
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Gene", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex e = new QueryVertex("Keyword", new HashMap<String, Tuple2<String, String>>(), false);
+				
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ac = new QueryEdge(a, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ad = new QueryEdge(a, d, "EncodedOn", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ae = new QueryEdge(a, e, "HasKeyword", new HashMap<String, Tuple2<String, String>>());
+				
+				QueryVertex[] vs = {a, b, c, d, e};
+				QueryEdge[] es = {ab, ac, ad, ae};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
+			case "13": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein)  
+				//WHERE (a) - [:Reference] -> (c:Article) AND
+				//		(a) - [:EncodedOn] -> (d:Gene)    AND
+				//		(a) - [:HasKeyword] -> (e:Keyword) AND
+				//		(a) - [:PublishedIn] -> (f:Journal)
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Gene", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex e = new QueryVertex("Keyword", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex f = new QueryVertex("Journal", new HashMap<String, Tuple2<String, String>>(), false);
+				
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ac = new QueryEdge(a, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ad = new QueryEdge(a, d, "EncodedOn", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ae = new QueryEdge(a, e, "HasKeyword", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge af = new QueryEdge(a, f, "PublishedIn", new HashMap<String, Tuple2<String, String>>());
+				
+				QueryVertex[] vs = {a, b, c, d, e, f};
+				QueryEdge[] es = {ab, ac, ad, ae, af};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
+			case "14": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein)  
+				//WHERE (a) - [:Reference] -> (c:Article) AND
+				//		(a) - [:EncodedOn] -> (d:Gene)    AND
+				//		(b) - [:HasKeyword] -> (e:Keyword) AND
+				//		(b) - [:PublishedIn] -> (f:Journal)
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Gene", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex e = new QueryVertex("Keyword", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex f = new QueryVertex("Journal", new HashMap<String, Tuple2<String, String>>(), false);
+				
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ac = new QueryEdge(a, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ad = new QueryEdge(a, d, "EncodedOn", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge be = new QueryEdge(b, e, "HasKeyword", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bf = new QueryEdge(b, f, "PublishedIn", new HashMap<String, Tuple2<String, String>>());
+				
+				QueryVertex[] vs = {a, b, c, d, e, f};
+				QueryEdge[] es = {ab, ac, ad,  be, bf};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
+			
+			case "15": {
+				//MATCH (a:Protein) - [:Interacts] -> (b:Protein)  
+				//WHERE (a) - [:Reference] -> (c:Article) AND
+				//		(a) - [:EncodedOn] -> (d:Gene)    AND
+				//		(b) - [:HasKeyword] -> (e:Keyword) AND
+				//		(b) - [:PublishedIn] -> (f:Journal)AND
+				//      (b) - [:Interacts] -> (h:Protein)
+				//RETURN a
+				QueryVertex a = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), true);
+				QueryVertex b = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex c = new QueryVertex("Article", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex d = new QueryVertex("Gene", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex e = new QueryVertex("Keyword", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex f = new QueryVertex("Journal", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryVertex h = new QueryVertex("Protein", new HashMap<String, Tuple2<String, String>>(), false);
+				QueryEdge ab = new QueryEdge(a, b, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ac = new QueryEdge(a, c, "Reference", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge ad = new QueryEdge(a, d, "EncodedOn", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge be = new QueryEdge(b, e, "HasKeyword", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bf = new QueryEdge(b, f, "PublishedIn", new HashMap<String, Tuple2<String, String>>());
+				QueryEdge bh = new QueryEdge(b, h, "Interacts", new HashMap<String, Tuple2<String, String>>());
+				
+				QueryVertex[] vs = {a, b, c, d, e, f, h};
+				QueryEdge[] es = {ab, ac, ad,  be, bf, bh};
+				
+				QueryGraph g = new QueryGraph(vs, es);
+				
+				QueryPlanner pg = new QueryPlanner(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+			}
 		}
 	}
 
@@ -372,29 +565,9 @@ public class QueryPlanGeneratorTest {
 			
 			
 			HashMap<String, String> properties = new HashMap<>();
-			/*String pattern = "[^=]+=([^= ]*( |$))*";
-			Pattern r = Pattern.compile(pattern);
-			Matcher m = r.matcher(vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1));
-			while(m.find()) {
-				String[] keyAndValue = m.group(0).split("=");
-				if(keyAndValue.length >= 2){
-					String key = keyAndValue[0];
-					String value = keyAndValue[1];
-					if(value.length() >= 2){
-						if(value.substring(value.length() - 2, value.length()).equals(", ")){
-							properties.put(key, value.substring(0, value.length() - 2));
-						}
-						else{
-							properties.put(key, value);
-						}
-					}
-				}
-				else {
-					String key = keyAndValue[0];
-					String value = "";
-					properties.put(key, value);
-				}
-			}*/
+		
+			
+			/*
 			String propString = vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1);
 			String[] fields = propString.split(", ");
 			String lastk = null;
@@ -411,7 +584,7 @@ public class QueryPlanGeneratorTest {
 					properties.put(kv[0], kv[1]);
 					lastk = kv[0];
 				}
-			}
+			}*/
 			vertex.setProps(properties);
 			
 			return vertex;
