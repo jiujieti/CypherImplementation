@@ -3,8 +3,6 @@ package ldbc;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import operators.*;
 import operators.booleanExpressions.AND;
@@ -16,17 +14,12 @@ import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
 
-import org.apache.flink.api.common.functions.FilterFunction;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.operators.Order;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
-import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
-//import org.apache.flink.configuration.ConfigConstants;
-//import org.apache.flink.configuration.Configuration;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 
 
@@ -34,18 +27,8 @@ import org.apache.flink.core.fs.FileSystem.WriteMode;
 public class LDBCTest {
 	public static void main(String[] args) throws Exception {
 		final ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
-		//env.setParallelism(1);
-		//Configuration conf = new Configuration();
-		//conf.setString(ConfigConstants.JOB_MANAGER_IPC_ADDRESS_KEY, "127.0.0.1");
-		//conf.setInteger(ConfigConstants.JOB_MANAGER_IPC_PORT_KEY, 6123);
-		//conf.setInteger(ConfigConstants.JOB_MANAGER_WEB_PORT_KEY, 8081);
-		//conf.setInteger(ConfigConstants.TASK_MANAGER_MEMORY_SIZE_KEY, 2048); 
-		//conf.setInteger(ConfigConstants.TASK_MANAGER_NUM_TASK_SLOTS, 8);
-		//final ExecutionEnvironment env = ExecutionEnvironment.createLocalEnvironment(conf);
-		//env.setParallelism(Integer.parseInt(args[0]));
 	
-		//String dir = args[0];
-		String dir = "C:/Users/s146508/Desktop/ubuntu/5kPerson/";
+		String dir = args[0];
 		DataSet<Tuple3<Long, String, String>> verticesFromFile = env.readCsvFile(dir + "vertices.csv")
 				.fieldDelimiter("|")
 				.types(Long.class, String.class, String.class);
@@ -63,112 +46,6 @@ public class LDBCTest {
 		GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromDataSet(vertices, edges, env);
 		
-		
-		// MATCH (m: person) - [:knows*1..2] -> (n: person)
-		// RETURN n
-		
-		//Get all starting node ids whose labels are "person"
-		/*ScanOperators scanOps = new ScanOperators(graph);
-	    HashSet<String> q1 = new HashSet<>();
-	    q1.add("person");
-	    DataSet<ArrayList<Long>> startingVertexIds = scanOps.getInitialVerticesByLabels(q1);
-	    
-	    //[startingVertexId, endVertexId]
-	    LabelMatchingOperators lengthRelationshipOps = new LabelMatchingOperators(graph, startingVertexIds);
-	    String q2 = "knows";
-	    DataSet<ArrayList<Long>> paths = lengthRelationshipOps.matchWithBounds(0, 1, 2, q2, JoinHint.REPARTITION_SORT_MERGE);
-	   
-	    
-	    //filter endVertexIds above
-	    UnaryOperators unaryOps = new UnaryOperators(graph, paths);
-	    HashSet<String> q3 = new HashSet<>();
-	    q3.add("person");
-	    unaryOps.selectVerticesByLabels(1, q3);
-	    
-	   
-	    //return results n (projection)
-	   unaryOps.projectDistinctVertices(1).print();*/
-		
-		
-		//MATCH (m:comment) - [] -> (n:person)
-		//RETURN n
-		/*ScanOperators scanOps = new ScanOperators(graph);
-	    HashSet<String> q1 = new HashSet<>();
-	    q1.add("comment");
-	    DataSet<ArrayList<Long>> paths = scanOps.getInitialVerticesByLabels(q1);
-	    
-	    UnaryOperators unaryOps = new UnaryOperators(graph, paths);
-	    unaryOps.selectEdgesOnRightSide(0, JoinHint.BROADCAST_HASH_FIRST);
-	    
-	   
-	    HashMap<String, String> q3 = new HashMap<>();
-	    q3.put("browserUsed", "Chrome");
-	    //HashSet<String> q3 = new HashSet<>();
-	    //q3.add("person");
-	    unaryOps.selectVerticesByProperties(2, q3);
-	    
-	    unaryOps.projectDistinctVertices(2).print();*/
-		
-		//simple select m: comment
-		/*ScanOperators scanOps = new ScanOperators(graph);
-	    HashSet<String> q1 = new HashSet<>();
-	    q1.add("comment");
-	    DataSet<ArrayList<Long>> paths = scanOps.getInitialVerticesByLabels(q1);
-	    paths.print();*/
-		
-		//m: comment - [:hasCreator]
-		/*ScanOperators scanOps = new ScanOperators(graph);
-	    HashSet<String> q1 = new HashSet<>();
-	    q1.add("comment");
-	    DataSet<ArrayList<Long>> paths = scanOps.getInitialVerticesByLabels(q1);
-	    
-	    UnaryOperators unaryOps = new UnaryOperators(graph, paths);
-	    unaryOps.selectOutEdgesByLabel(0, "hasCreator", JoinHint.REPARTITION_HASH_FIRST).print();
-	    */
-		
-		
-		// query 9
-		/*ScanOperators scanOps = new ScanOperators(graph);
-	    HashSet<String> q1 = new HashSet<>();
-	    q1.add("person");
-	    DataSet<ArrayList<Long>> paths = scanOps.getInitialVerticesByLabels(q1);
-	    
-	    UnaryOperators unaryOps = new UnaryOperators(graph, paths);
-	    
-	
-	    unaryOps.selectOutEdgesByLabel(0, "likes", JoinHint.BROADCAST_HASH_FIRST);
-	    
-	    HashMap<String, String> props = new HashMap<>();
-	    props.put("browserUsed", "Chrome");
-	    OR<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new OR<>
-	    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", 50));
-	    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q3 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
-	    (new LabelComparisonForVertices("comment"), q2);
-	    
-	    unaryOps.selectVerticesByBooleanExpressions(2, q3);
-	    
-	    unaryOps.projectDistinctVertices(2).print();*/
-		
-	    //query 10
-	    /*ScanOperators scanOps = new ScanOperators(graph);
-	    HashMap<String, String> props = new HashMap<>();
-	    props.put("browserUsed", "Chrome");
-	    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q1 = new AND<>
-	    (new PropertyMatchForVertices(props), new PropertyFilterForVertices("length", ">", 50));
-	    AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q2 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
-	    (new LabelComparisonForVertices("comment"), q1);
-	    
-	    DataSet<ArrayList<Long>> paths = scanOps.getInitialVerticesByBooleanExpressions(q2);
-	    
-	    UnaryOperators unaryOps = new UnaryOperators(graph, paths);
-	    unaryOps.selectInEdgesByLabel(0, "likes", JoinHint.BROADCAST_HASH_FIRST);
-	    
-	    HashSet<String> q3 = new HashSet<>();
-	    q3.add("person");
-	    unaryOps.selectVerticesByLabels(2, q3);
-	
-	    unaryOps.projectDistinctVertices(0).print();		*/
-		//query11
 		switch(args[1]) {
 			case "1": {
 				//MATCH (m:person) no output linear
@@ -434,12 +311,12 @@ public class LDBCTest {
 			case "13": {
 				ScanOperators scanOps1 = new ScanOperators(graph);
 				HashSet<String> q1 = new HashSet<>();
-				q1.add("person");
+				q1.add("comment");
 				DataSet<ArrayList<Long>> paths1 = scanOps1.getInitialVerticesByLabels(q1);
 				
 				ScanOperators scanOps2 = new ScanOperators(graph);
 				HashSet<String> q2 = new HashSet<>();
-				q2.add("comment");
+				q2.add("person");
 				DataSet<ArrayList<Long>> paths2 = scanOps2.getInitialVerticesByLabels(q2);
 
 				ScanOperators scanOps3 = new ScanOperators(graph);
@@ -447,34 +324,57 @@ public class LDBCTest {
 				q3.add("post");
 				DataSet<ArrayList<Long>> paths3 = scanOps3.getInitialVerticesByLabels(q3);
 				
-				UnaryOperators unaryOps1 = new UnaryOperators(graph, paths2);
+				UnaryOperators unaryOps1 = new UnaryOperators(graph, paths1);
 				DataSet<ArrayList<Long>> paths4 = unaryOps1.selectOutEdgesByLabel(0, "hasCreator", JoinHint.BROADCAST_HASH_FIRST);
 
-				//person join post
-				BinaryOperators binaryOps1 = new BinaryOperators(paths4, paths1);
+				BinaryOperators binaryOps1 = new BinaryOperators(paths4, paths2);
 				DataSet<ArrayList<Long>> paths5 = binaryOps1.joinOnAfterVertices(2, 0);
-				//HashSet<String> q3 = new HashSet<>();
-				//q3.add("post");
-				//DataSet<ArrayList<Long>> paths4 = unaryOps1.selectVerticesByLabels(2, q3);
-				//
-				//System.out.println(paths4.count());
-				UnaryOperators unaryOps2 = new UnaryOperators(graph, paths3);
-				DataSet<ArrayList<Long>> paths6 = unaryOps2.selectOutEdgesByLabel(0, "hasCreator", JoinHint.BROADCAST_HASH_FIRST);
-
-				BinaryOperators binaryOps2 = new BinaryOperators(paths5, paths6);
-				DataSet<ArrayList<Long>> paths7 = binaryOps2.joinOnAfterVertices(2, 2);
+								
+				UnaryOperators unaryOps2 = new UnaryOperators(graph, paths5);
+				DataSet<ArrayList<Long>> paths6 = unaryOps2.selectInEdgesByLabel(2, "hasCreator", JoinHint.BROADCAST_HASH_FIRST);
 				
-				System.out.println(paths7.count());//map(new GetPerson()).distinct().count();//writeAsText(args[2], WriteMode.OVERWRITE);
-				//paths5.writeAsText(args[2], WriteMode.OVERWRITE);
-				//env.execute();
+				BinaryOperators binaryOps2 = new BinaryOperators(paths6, paths3);
+				DataSet<ArrayList<Long>> paths7 = binaryOps2.joinOnAfterVertices(4, 0);
+				
+				UnaryOperators unaryOps3 = new UnaryOperators(graph, paths7);
+				unaryOps3.projectDistinctVertices(2).writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
 				break;
 				
 			}
 			case "14": {
 				ScanOperators scanOps1 = new ScanOperators(graph);
+				HashSet<String> q1 = new HashSet<>();
+				q1.add("comment");
+				DataSet<ArrayList<Long>> paths1 = scanOps1.getInitialVerticesByLabels(q1);
 				
-				
+				ScanOperators scanOps2 = new ScanOperators(graph);
+				HashSet<String> q2 = new HashSet<>();
+				q2.add("person");
+				DataSet<ArrayList<Long>> paths2 = scanOps2.getInitialVerticesByLabels(q2);
 
+				ScanOperators scanOps3 = new ScanOperators(graph);
+				HashSet<String> q3 = new HashSet<>();
+				q3.add("post");
+				DataSet<ArrayList<Long>> paths3 = scanOps3.getInitialVerticesByLabels(q3);
+				
+				UnaryOperators unaryOps1 = new UnaryOperators(graph, paths1);
+				DataSet<ArrayList<Long>> paths4 = unaryOps1.selectOutEdgesByLabel(0, "hasCreator", JoinHint.BROADCAST_HASH_FIRST);
+
+				UnaryOperators unaryOps2 = new UnaryOperators(graph, paths3);
+				DataSet<ArrayList<Long>> paths5 = unaryOps2.selectOutEdgesByLabel(0, "hasCreator", JoinHint.BROADCAST_HASH_FIRST);
+
+				BinaryOperators binaryOps1 = new BinaryOperators(paths4, paths5);
+				DataSet<ArrayList<Long>> paths6 = binaryOps1.joinOnAfterVertices(2, 2);
+				
+				BinaryOperators binaryOps2 = new BinaryOperators(paths6, paths2);
+				DataSet<ArrayList<Long>> paths7 = binaryOps2.joinOnAfterVertices(2, 0);
+				
+				UnaryOperators unaryOps3 = new UnaryOperators(graph, paths7);
+				unaryOps3.projectDistinctVertices(2).writeAsText(args[2], WriteMode.OVERWRITE);
+				env.execute();
+				break;
+				
 			}
 		}
 	
@@ -508,7 +408,7 @@ public class LDBCTest {
 				if (kv.length == 1) {
 					// Continuation of last field
 					if (lastk == null) {
-						throw new Exception("bad property string " + propString);
+						throw new Exception("Bad property string " + propString);
 					}
 					properties.put(lastk, properties.get(lastk) + ", " + kv[0]);
 				} else {
@@ -524,7 +424,7 @@ public class LDBCTest {
 		}
 		
 	}
-	 //[^=]+=([^= ]*( |$))* 
+	
 	private static class EdgesFromFileToDataSet implements MapFunction<Tuple5<Long, Long, Long, String, String>, 
 						EdgeExtended<Long, Long, String, HashMap<String, String>>> {
 
