@@ -12,7 +12,9 @@ import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.util.Collector;
-
+/*
+*
+* */
 @SuppressWarnings("serial")
 public class GMarkToGraphDataModel {
 	
