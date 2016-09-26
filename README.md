@@ -52,8 +52,11 @@ The implementation of basic operators could be found [here](https://github.com/j
 ##Tools
 
 ###gMark
-###LDBC
 
+More information about [gMark](https://github.com/graphMark/gmark).
+###LDBC-SNB
+
+More information about [LDBC-SNB](http://ldbcouncil.org/developer/snb).
 ##How to Run a Test Example or a Query Plan Generator?
 ###Run a Test Example
 ###Run a Query Plan Generator
