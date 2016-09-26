@@ -18,6 +18,7 @@ edge(id: long, sourceId: long, targetId: long, label: String, properties: Map<St
 
 The `id` and the `properties` defined in an edge have similar meanings in those of a vertex. Note that an edge in a labeled property graph defined by Neo4j at most contains one label, thus the data type is defined as `String`. Besides, the `sourceId`
 
-All these representations of a graph model are defined [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators/datastructures).
+All these representations could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators/datastructures).
 
-##Implementation Operators
+##Basic Operators
+Basic operators are defined to perform queries on a labeled property graph.
