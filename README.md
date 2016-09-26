@@ -26,6 +26,7 @@ All these representations could be found [here](https://github.com/jiujieti/Cyph
 
 ##Basic Operators
 Basic operators are defined to perform queries on a labeled property graph. All the queries performed on a graph database are based on graph pattern matching. After the execution of a basic operator, paths, each of which consists of IDs of all vertices and edges on it, will be returned (except the projection operator). Note that a path here may only contain one vertex ID, which is returned by a scan operator.
+
 1. Scan operator:
 A scan operator is used to find all vertices by various types of [filtering conditions](#filtering-conditions).
 
