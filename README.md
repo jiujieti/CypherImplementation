@@ -43,7 +43,6 @@ The implementation of basic operators could be found [here](https://github.com/j
 
 ###Filtering Conditions
 
-
 ##Query Execution Strategies
 
 ###Cost-based Optimizer

@@ -1,7 +1,9 @@
 package gmark;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
-
+/*
+*
+* */
 public class GMarkDataGenerator {
 	public static void main (String[] args) throws Exception {
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
