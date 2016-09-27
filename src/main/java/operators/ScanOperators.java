@@ -1,6 +1,5 @@
 package operators;
 
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,19 +13,26 @@ import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.common.functions.FilterFunction;
 
-
+/*
+* A scan operator is used to extract all vertex IDs which satisfy certain filtering conditions.
+* The filtering conditions could be:
+* (1) no conditions
+* (2) filtering conditions on labels of vertices
+* (3) filtering conditions on properties of vertices
+* (4) a combination of conditions related by complex boolean expressions
+* */
 @SuppressWarnings("serial")
 public class ScanOperators {
 	private final GraphExtended<Long, HashSet<String>, HashMap<String, String>, Long,
 	  String, HashMap<String, String>> graph;
 		
-	//get the input graph
+	//Get the input graph
 	public ScanOperators(GraphExtended<Long, HashSet<String>, HashMap<String, String>, Long,
 			  String, HashMap<String, String>> g) {
 		this.graph = g;
 	}
 	
-	// get the initial vertex ids of the graph
+	//Get vertex IDs of a graph
 	public DataSet<ArrayList<Long>> 
 		getInitialVertices() {
 		DataSet<ArrayList<Long>> vertexIds = graph
@@ -34,7 +40,8 @@ public class ScanOperators {
 			.map(new InitialVerticesToLists());
 		return vertexIds;
 	}
-	
+
+	//Extract vertex IDs into ArrayList from vertices
 	private static class InitialVerticesToLists implements MapFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>, ArrayList<Long>> {
 		
 		@Override
@@ -46,16 +53,17 @@ public class ScanOperators {
 		}
 	}
 	
-	//get the initial edge ids of the graph
+	//Get edge IDs of a graph
 	//not very useful so far
-	public DataSet<ArrayList<Long>>
-		getInitialEdges() {
+	public DataSet<ArrayList<Long>> getInitialEdges() {
 		DataSet<ArrayList<Long>> edgeIds = graph
 			.getEdges()
 			.map(new InitialEdgesToLists());
 		return edgeIds;
 	}
-	
+
+	//Extract edge IDs into ArrayList from edges
+	//also not very useful so far
 	private static class InitialEdgesToLists implements MapFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>, ArrayList<Long>> {
 		private static final long serialVersionUID = 1L;
 		
@@ -67,7 +75,7 @@ public class ScanOperators {
 		}
 	}
 	
-	//get the initial vertex ids with label constraints
+	//Get vertex ids with label constraints
 	public DataSet<ArrayList<Long>> getInitialVerticesByLabels(HashSet<String> labels) {
 		DataSet<ArrayList<Long>> vertexIds = graph
 				.getVertices()
@@ -76,7 +84,8 @@ public class ScanOperators {
 		return vertexIds;
 				
 	}
-	
+
+	//Check whether all labels specified in the query are contained
 	private static class FilterVerticesByLabel implements FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
 		private HashSet<String> labels;
 		
@@ -92,7 +101,7 @@ public class ScanOperators {
 		}	
 	}
 	
-	//get the initial vertex ids with label constraints
+	//Get vertex IDs with property constraints
 	public DataSet<ArrayList<Long>> getInitialVerticesByProperties(HashMap<String, String> properties) {
 		DataSet<ArrayList<Long>> vertexIds = graph
 				.getVertices()
@@ -100,7 +109,8 @@ public class ScanOperators {
 				.map(new InitialVerticesToLists());
 		return vertexIds;
 	}
-		
+
+	//Check whether all properties specified in the query are existing the corresponding values of certain properties are consistent with ones in the query
 	private static class FilterVerticesByProperties implements FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> {
 	    HashMap<String, String> properties;
 		
@@ -121,7 +131,8 @@ public class ScanOperators {
 			return true;
 		}	
 	}
-	
+
+	//Get vertex IDs filtered by a combination of conditions related by complex boolean expressions
 	public DataSet<ArrayList<Long>> getInitialVerticesByBooleanExpressions(
 			FilterFunction<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> filterVertices){
 		
@@ -131,8 +142,4 @@ public class ScanOperators {
 				.map(new InitialVerticesToLists());
 		return vertexIds; 
 	}
-	
 }
-	
-	
-
