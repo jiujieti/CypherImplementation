@@ -20,7 +20,7 @@ Similarly an edge is a 5-tuple:
 edge(id: long, sourceId: long, targetId: long, label: String, properties: Map<String, String>)
 ```
 
-The `id` and the `properties` defined in an edge have similar meanings in those of a vertex. Note that an edge in a labeled property graph defined by Neo4j at most contains one label, thus the data type is defined as `String`. Besides, the `sourceId`
+The `id` and the `properties` defined in an edge have similar meanings in those of a vertex. Note that an edge in a labeled property graph defined by Neo4j at most contains one label, thus the data type is defined as `String`. Besides, the `sourceId` and the `targetId` indicate the source vertex ID and the target vertex ID of this edge respectively. 
 
 All these representations could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators/datastructures).
 
