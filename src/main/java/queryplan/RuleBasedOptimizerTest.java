@@ -1,14 +1,8 @@
 package queryplan;
 
-import java.util.HashMap;
-import java.util.HashSet;
-//import java.util.regex.Matcher;
-//import java.util.regex.Pattern;
-
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
-
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -16,10 +10,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
+import queryplan.querygraph.QueryEdge;
+import queryplan.querygraph.QueryGraph;
+import queryplan.querygraph.QueryVertex;
 
-import queryplan.querygraph.*;
+import java.util.HashMap;
+import java.util.HashSet;
+
 @SuppressWarnings("serial")
-public class QueryPlanGeneratorTest {
+public class RuleBasedOptimizerTest {
 	public static void main(String[] args) throws Exception {
 		
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -68,9 +67,9 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
-				res.writeAsText(args[2], WriteMode.OVERWRITE);	
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
 			} 
@@ -97,7 +96,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -127,7 +126,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -158,7 +157,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -193,7 +192,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -228,7 +227,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -266,7 +265,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -304,7 +303,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -342,7 +341,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -366,7 +365,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -390,7 +389,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -413,7 +412,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -441,7 +440,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -472,7 +471,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -503,7 +502,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -537,7 +536,7 @@ public class QueryPlanGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanner pg = new QueryPlanner(g, graph);
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -562,31 +561,8 @@ public class QueryPlanGeneratorTest {
 				labels.add(label);
 			}
 			vertex.setLabels(labels);
-			
-			
 			HashMap<String, String> properties = new HashMap<>();
-		
-			
-			/*
-			String propString = vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1);
-			String[] fields = propString.split(", ");
-			String lastk = null;
-			for (String f: fields) {
-				String[] kv = f.split("=", 2);
-				if (kv.length == 1) {
-					// Continuation of last field
-					if (lastk == null) {
-						throw new Exception("bad property string " + propString);
-					}
-					properties.put(lastk, properties.get(lastk) + ", " + kv[0]);
-				} else {
-					// New field
-					properties.put(kv[0], kv[1]);
-					lastk = kv[0];
-				}
-			}*/
 			vertex.setProps(properties);
-			
 			return vertex;
 			
 		}

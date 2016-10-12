@@ -23,9 +23,6 @@ public class StatisticsCollector {
 		env.setParallelism(1);
 		String srcDir = args[0];
 		String tarDir = args[1];
-		//String srcDir = "C:/Users/s146508/Desktop/ubuntu/5kPerson/";
-		//String srcDir = "C:/Users/s146508/Desktop/ubuntu/a/";
-		//String tarDir = srcDir;
 		StatisticsCollector k = new StatisticsCollector(env, srcDir, tarDir);
 		k.getEdgesStats();
 		k.getVerticesStats();
@@ -39,7 +36,8 @@ public class StatisticsCollector {
 		srcDir = s;
 		tarDir = t;
 	}
-	
+
+	//This function will write a three-column file to the target directory. The three column consists of the vertex label names, the number of the vertices and the proportion.
 	public DataSet<Tuple3<String, Long, Double>>  getVerticesStats () throws Exception {
 		
 		DataSet<Tuple3<Long, String, String>> verticesFromFile = env.readCsvFile(srcDir + "vertices.csv")
@@ -61,7 +59,8 @@ public class StatisticsCollector {
 		env.execute();
 		return vertices;
 	}
-	
+
+	//This function will write a three-column file to the target directory. The three column consists of the edge label names, the number of the vertices and the proportion.
 	public DataSet<Tuple3<String, Long, Double>> getEdgesStats () throws Exception {
 		
 		DataSet<Tuple5<Long, Long, Long, String, String>> edgesFromFile = env.readCsvFile(srcDir + "edges.csv")
@@ -85,31 +84,7 @@ public class StatisticsCollector {
 
 	}
 	
-	//compute the distribution in the form of (v) -> [e]
-	public void getVEDistStats (DataSet<Tuple3<String, Long, Double>> vs, DataSet<Tuple3<String, Long, Double>> es) {	
-		
-		DataSet<Tuple3<Long, String, String>> verticesFromFile = env.readCsvFile(srcDir + "vertices.csv")
-				.fieldDelimiter("|")
-				.types(Long.class, String.class, String.class);
-		
-		DataSet<Tuple5<Long, Long, Long, String, String>> edgesFromFile = env.readCsvFile(srcDir + "edges.csv")
-				.fieldDelimiter("|")
-				.types(Long.class, Long.class, Long.class, String.class, String.class);
-		
-		//Tuple4<v-label, e-label, num, num/v_num>	
-		//ArrayList<Tuple3<String, Long, Double>> vsl = (ArrayList<Tuple3<String, Long, Double>>) vs.collect();
-		//ArrayList<Tuple3<String, Long, Double>> esl = (ArrayList<Tuple3<String, Long, Double>>) es.collect();
-		
-		//DataSet<Tuple4<String, String, Long, Double>> srcVertexDist = vs.
-		
-	
-	}
-	
-	public void getEVDistStats () {
-		//compute the distribution in the form of [e] -> (v)
-		
-	}
-	
+
 	private static class ExtractVertexLabels implements FlatMapFunction<Tuple3<Long, String, String>, Tuple2<String, Long>>{
 
 		@Override

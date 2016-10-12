@@ -1,12 +1,8 @@
 package queryplan;
 
-import java.util.HashMap;
-import java.util.HashSet;
-
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
-
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.DataSet;
 import org.apache.flink.api.java.ExecutionEnvironment;
@@ -14,16 +10,15 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
-
-
-
-
-
 import queryplan.querygraph.QueryEdge;
 import queryplan.querygraph.QueryGraph;
 import queryplan.querygraph.QueryVertex;
+
+import java.util.HashMap;
+import java.util.HashSet;
+
 @SuppressWarnings("serial")
-public class QueryGeneratorTest {
+public class CostBasedOptimizerTest {
 	
 	public static void main(String[] args) throws Exception {
 		
@@ -77,7 +72,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);	
 				env.execute();
@@ -106,7 +101,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -136,7 +131,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -167,7 +162,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -202,7 +197,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -236,7 +231,7 @@ public class QueryGeneratorTest {
 				QueryEdge[] es = {ab, cb, bd, be};
 				
 				QueryGraph g = new QueryGraph(vs, es);
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -274,7 +269,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -312,7 +307,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -350,7 +345,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -374,7 +369,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -397,7 +392,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -420,7 +415,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -448,7 +443,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -479,7 +474,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -510,7 +505,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
@@ -544,7 +539,7 @@ public class QueryGeneratorTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				QueryPlanGenerator pg = new QueryPlanGenerator(g, graph, vstat, estat);
+				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
 				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();

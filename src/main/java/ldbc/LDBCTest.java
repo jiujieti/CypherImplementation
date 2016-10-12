@@ -22,7 +22,7 @@ import org.apache.flink.api.java.tuple.Tuple3;
 import org.apache.flink.api.java.tuple.Tuple5;
 import org.apache.flink.core.fs.FileSystem.WriteMode;
 
-
+/*Test queries for LDBC generated database */
 @SuppressWarnings("serial")
 public class LDBCTest {
 	public static void main(String[] args) throws Exception {

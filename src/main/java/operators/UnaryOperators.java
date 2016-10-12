@@ -21,7 +21,12 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.util.Collector;
 
 @SuppressWarnings("serial")
+/*
+*
+*
+* */
 public class UnaryOperators {
+
 	//Input graph
 	private GraphExtended<Long, HashSet<String>, HashMap<String, String>, Long,
 	  String, HashMap<String, String>> graph;
@@ -74,10 +79,8 @@ public class UnaryOperators {
 		}	
 	}
 
-	
-	
 		
-	//select all vertices not including the label
+	//Select all vertices not including the label
 	public DataSet<ArrayList<Long>> selectReverseVerticesByLabels(int col, HashSet<String> labs){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
@@ -99,7 +102,6 @@ public class UnaryOperators {
 		JoinAndFilterReverseVerticesByLabels(HashSet<String> labelSet) { this.labels = labelSet;}
 	
 		@Override
-	
 		public void join(
 				ArrayList<Long> edgesAndVertices,
 				VertexExtended<Long, HashSet<String>, HashMap<String, String>> vertex,
@@ -111,7 +113,7 @@ public class UnaryOperators {
 			}	
 		}
 	
-	//select all vertices by their properties
+	//Select all vertices by their properties
 	public DataSet<ArrayList<Long>> selectVerticesByProperties(int col, HashMap<String, String> props){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
@@ -181,7 +183,7 @@ public class UnaryOperators {
 		return selectedResults;
 	}
 	
-	//select all vertices not including the properties
+	//Select all vertices not including the properties
 	public DataSet<ArrayList<Long>> selectReverseVerticesByProperties(int col, HashMap<String, String> props){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 		DataSet<ArrayList<Long>> selectedResults = paths
@@ -221,7 +223,7 @@ public class UnaryOperators {
 			}	
 	}
 
-	//select all vertices by both labels and properties
+	//Select all vertices by both labels and properties
 	public DataSet<ArrayList<Long>> selectVertices(int col, HashSet<String> labs, 
 			HashMap<String, String> props){
 		KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
@@ -519,7 +521,7 @@ public class UnaryOperators {
 		}
 	}
 	
-	//select outgoing edges by boolean expressions 
+	//Select outgoing edges by boolean expressions
 	public DataSet<ArrayList<Long>> selectOutEdgesByBooleanExpressions(int col, 
 	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges, JoinHint strategy){
 		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
@@ -534,7 +536,7 @@ public class UnaryOperators {
 		return selectedResults;
 	}
 
-	//select ingoing edges by boolean expressions 
+	//Select ingoing edges by boolean expressions
 	public DataSet<ArrayList<Long>> selectInEdgesByBooleanExpressions(int col, 
 	FilterFunction<EdgeExtended<Long, Long, String, HashMap<String, String>>> filterEdges, JoinHint strategy){
 		KeySelectorForColumns edgesSelector = new KeySelectorForColumns(col);
@@ -549,7 +551,7 @@ public class UnaryOperators {
 		return selectedResults;
 	}
 	
-	//return all vertices specified by their IDs in a column
+	//Return all vertices specified by their IDs in a column
 	public DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> projectDistinctVertices(int col){
 		DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> returnedVertices = paths
 				.map(new ExtractVertexIds(col))
@@ -585,7 +587,7 @@ public class UnaryOperators {
 	}
 	
 
-	//return all edges specified by their IDs in a column
+	//Return all edges specified by their IDs in a column
 	public DataSet<EdgeExtended<Long, Long, String, HashMap<String, String>>> projectDistinctEdges(int col){
 		DataSet<EdgeExtended<Long, Long, String, HashMap<String, String>>> returnedVertices = paths
 				.map(new ExtractEdgeIds(col))
