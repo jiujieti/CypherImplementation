@@ -1,7 +1,6 @@
 package operators.datastructures;
 
 import org.apache.flink.api.java.tuple.Tuple5;
-//import java.util.HashMap;
 /**
  * Extended edge for Cypher Implementation
  * @param <E> the key type for the edges
@@ -64,13 +63,4 @@ public class EdgeExtended<E, K, L, P> extends Tuple5<E, K, K, L, P>{
 		return f4;
 	}
 		
-/*	public boolean containsLabel(E labelInput) {
-		if(labelInput.equals(f3))
-			return true;
-		else return false;
-	}
-	
-	public boolean containsProps(V propsInput) {
-		return true;
-	}*/
 }

@@ -7,6 +7,11 @@ import org.apache.flink.api.java.tuple.Tuple3;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+
+/*
+* Read the files storing statistical information and transform them to the vertices and edges defined in the package operators.datastructure
+* */
+
 public class StatisticsTransformation {
 	String dir;
 	ExecutionEnvironment env;

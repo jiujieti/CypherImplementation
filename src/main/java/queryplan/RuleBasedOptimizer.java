@@ -25,7 +25,8 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 /*
-*
+* A rule based optimizer which utilizes some heuristic rules to optimize graph queries
+* For filtering conditions, so far the optimizer can only process conjunctive filtering conditions
 * */
 
 @SuppressWarnings("unchecked")

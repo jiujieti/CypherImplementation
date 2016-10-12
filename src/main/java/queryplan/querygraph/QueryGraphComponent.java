@@ -3,8 +3,13 @@ import java.util.ArrayList;
 
 import org.apache.flink.api.java.DataSet;
 public class QueryGraphComponent {
+	//indicate the estimated cardinality of the current graph component
 	double est;
+
+	//indicate the positions of all retrieved results in returned paths
 	DataSet<ArrayList<Long>> data;
+
+	//store vertices and edges are contained in this graph component
 	ArrayList<Object> columns;
 	
 	

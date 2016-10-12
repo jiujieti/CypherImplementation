@@ -1,8 +1,10 @@
 package queryplan.querygraph;
 /**
  * Query Graph
- * A query graph consists of an array of vertices 
- *  */
+ * A query graph consists of an array of vertices and an array of edges
+ *
+ */
+
 public class QueryGraph {
 	QueryVertex[] vertices;
 	QueryEdge[] edges;
