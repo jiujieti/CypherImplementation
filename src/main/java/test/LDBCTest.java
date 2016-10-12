@@ -1,4 +1,4 @@
-package ldbc;
+package test;
 
 import java.util.ArrayList;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package queryplan;
+package test;
 
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
@@ -13,13 +13,13 @@ import org.apache.flink.core.fs.FileSystem.WriteMode;
 import queryplan.querygraph.QueryEdge;
 import queryplan.querygraph.QueryGraph;
 import queryplan.querygraph.QueryVertex;
+import queryplan.RuleBasedOptimizer;
 
 import java.util.HashMap;
 import java.util.HashSet;
 
 @SuppressWarnings("serial")
-public class CostBasedOptimizerTest {
-	
+public class RuleBasedOptimizerTest {
 	public static void main(String[] args) throws Exception {
 		
 		ExecutionEnvironment env = ExecutionEnvironment.getExecutionEnvironment();
@@ -35,16 +35,12 @@ public class CostBasedOptimizerTest {
 				.fieldDelimiter("|")
 				.types(Long.class, Long.class, Long.class, String.class, String.class);
 		
-		
 		DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> vertices 
 			= verticesFromFile.map(new VerticesFromFileToDataSet());
 		
 		DataSet<EdgeExtended<Long, Long, String, HashMap<String, String>>> edges
 			= edgesFromFile.map(new EdgesFromFileToDataSet());
 		
-		StatisticsTransformation sts = new StatisticsTransformation(dir, env);
-		HashMap<String, Tuple2<Long, Double>> vstat = sts.getVerticesStatistics();
-		HashMap<String, Tuple2<Long, Double>> estat = sts.getEdgesStatistics();
 		GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromDataSet(vertices, edges, env);
 				
@@ -72,9 +68,9 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
-				res.writeAsText(args[2], WriteMode.OVERWRITE);	
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
+				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
 			} 
@@ -101,8 +97,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -130,9 +126,9 @@ public class CostBasedOptimizerTest {
 				QueryEdge[] es = {ab, cb, cd};
 				
 				QueryGraph g = new QueryGraph(vs, es);
-
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -162,8 +158,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -197,8 +193,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -231,8 +227,9 @@ public class CostBasedOptimizerTest {
 				QueryEdge[] es = {ab, cb, bd, be};
 				
 				QueryGraph g = new QueryGraph(vs, es);
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -269,8 +266,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -307,8 +304,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -345,8 +342,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -369,11 +366,12 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
+				
 			}
 			case "10": {
 				//MATCH (a:Protein) - [:Interacts] -> (b:Protein) - [:Reference] -> (c:Article) - [:PublishedIn] -> (d:Journal) 
@@ -392,8 +390,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -415,8 +413,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -443,8 +441,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -474,8 +472,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -505,8 +503,8 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
@@ -539,13 +537,12 @@ public class CostBasedOptimizerTest {
 				
 				QueryGraph g = new QueryGraph(vs, es);
 				
-				CostBasedOptimzer pg = new CostBasedOptimzer(g, graph, vstat, estat);
-				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.generateQueryPlan();
+				RuleBasedOptimizer pg = new RuleBasedOptimizer(g, graph);
+				DataSet<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> res = pg.genQueryPlan();
 				res.writeAsText(args[2], WriteMode.OVERWRITE);
 				env.execute();
 				break;
 			}
-
 		}
 	}
 
@@ -565,58 +562,14 @@ public class CostBasedOptimizerTest {
 				labels.add(label);
 			}
 			vertex.setLabels(labels);
-			
-			
 			HashMap<String, String> properties = new HashMap<>();
-			/*String pattern = "[^=]+=([^= ]*( |$))*";
-			Pattern r = Pattern.compile(pattern);
-			Matcher m = r.matcher(vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1));
-			while(m.find()) {
-				String[] keyAndValue = m.group(0).split("=");
-				if(keyAndValue.length >= 2){
-					String key = keyAndValue[0];
-					String value = keyAndValue[1];
-					if(value.length() >= 2){
-						if(value.substring(value.length() - 2, value.length()).equals(", ")){
-							properties.put(key, value.substring(0, value.length() - 2));
-						}
-						else{
-							properties.put(key, value);
-						}
-					}
-				}
-				else {
-					String key = keyAndValue[0];
-					String value = "";
-					properties.put(key, value);
-				}
-			}*/
-			/*String propString = vertexFromFile.f2.substring(1, vertexFromFile.f2.length()-1);
-			String[] fields = propString.split(", ");
-			String lastk = null;
-			for (String f: fields) {
-				String[] kv = f.split("=", 2);
-				if (kv.length == 1) {
-					// Continuation of last field
-					if (lastk == null) {
-						throw new Exception("bad property string " + propString);
-					}
-					properties.put(lastk, properties.get(lastk) + ", " + kv[0]);
-				} else {
-					// New field
-					properties.put(kv[0], kv[1]);
-					lastk = kv[0];
-				}
-			}*/
 			vertex.setProps(properties);
-			
 			return vertex;
 			
 		}
 		
 	}
 	 //[^=]+=([^= ]*( |$))* 
-	
 	
 	private static class EdgesFromFileToDataSet implements MapFunction<Tuple5<Long, Long, Long, String, String>, 
 						EdgeExtended<Long, Long, String, HashMap<String, String>>> {

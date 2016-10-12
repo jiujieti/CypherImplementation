@@ -1,4 +1,4 @@
-package operators;
+package test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,6 +8,7 @@ import java.util.List;
 import operators.datastructures.EdgeExtended;
 import operators.datastructures.GraphExtended;
 import operators.datastructures.VertexExtended;
+import operators.*;
 
 import org.apache.flink.api.java.ExecutionEnvironment;
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;

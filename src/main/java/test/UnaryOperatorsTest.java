@@ -1,19 +1,12 @@
-package operators;
+package test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 
-
-
-
-import operators.booleanExpressions.AND;
-import operators.booleanExpressions.comparisons.LabelComparisonForVertices;
-import operators.booleanExpressions.comparisons.PropertyFilterForVertices;
-import operators.datastructures.EdgeExtended;
-import operators.datastructures.GraphExtended;
-import operators.datastructures.VertexExtended;
+import operators.*;
+import operators.datastructures.*;
 
 import org.apache.flink.api.common.operators.base.JoinOperatorBase.JoinHint;
 import org.apache.flink.api.java.DataSet;

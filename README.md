@@ -53,10 +53,12 @@ The rule-based optimizer to generate a query plan is to use heuristic rules to e
 ##Tools
 
 ###gMark
-gMark is a
+gMark is a dataset generator used in the project. Based on the design principles of gMark, gMark provides schema-driven generation of graphs and queries by utilizing a graph configuration. In term of generated graph instances, node types, edge types, both including proportions to the whole instance, and in- and out-degree distributions could all be defined by the users.
+
 More information about [gMark](https://github.com/graphMark/gmark).
 ###LDBC-SNB
-LDBC-SNB simulates all the behaviour of a social network of
+LDBC-SNB can simulates all activities of a user in a social network during a period of time and generate a synthetic social network. It is noticeable that the design principle of LDBC-SNB is not completely duplicating a real-life social network database, but concentrating on making the benchmark queries exhibit certain desired effects.
+
 More information about [LDBC-SNB](http://ldbcouncil.org/developer/snb).
 ##How to Run a Test Example or a Query Plan Generator?
 ###Run a Test Example
