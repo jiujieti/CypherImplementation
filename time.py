@@ -2,11 +2,13 @@ from os import listdir
 from os.path import isfile, join
 from datetime import datetime
 import xlsxwriter
-dir = "c:/Users/s146508/Desktop/zip2.0/"
+
+dir = "path_of_the_folder/where/you_store_your_log_files"
 
 workbook = xlsxwriter.Workbook(dir + 'results.xlsx')
-worksheets = {str(i): workbook.add_worksheet('q' + str(i)) for i in range(9, 16)}
-rows = {str(i): 0 for i in range(9, 16)}
+#range(0, 25) indicate specific query numbers, used to distingush queries
+worksheets = {str(i): workbook.add_worksheet('q' + str(i)) for i in range(0, 25)}
+rows = {str(i): 0 for i in range(0, 25)}
 
 onlyfiles = [f for f in listdir(dir) if isfile(join(dir, f)) and f.endswith('.txt')]
 col = 0
