@@ -46,9 +46,8 @@ The implementation of basic operators could be found [here](https://github.com/j
 ##Query Execution Strategies
 Two types of query execution strategies have been implemented, which could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/queryplan).
 ###Cost-based optimizer
-The cost-based query optimization algorithm is mainly based on pre-computed statistical information about the datasets. The general idea here is to first collect statistical information, that the number of vertices and edges with a specific label %and the proportion of this type taking up in the total number
-and then utilize these statistics to estimate the cardinality of query graph components in the query graph. From the previous stated generation procedure we can find that the pattern matching Cypher queries could execute a series of join operations, either a join operator or an edge-join operator in our implementation. Also the time cost of a scan operator could always be ignored compared to the time cost of a join operator.
-
+The cost-based query optimization algorithm is mainly based on pre-computed statistical information about the datasets. The general idea here is to first collect statistical information, that the number of vertices and edges with a specific label and the proportion of this type taking up in the total number
+and then utilize these statistics to estimate the cardinality of query graph components in the query graph.
 ###Rule-based optimizer
 The rule-based optimizer to generate a query plan is to use heuristic rules to estimate the cardinality of query graph components. Mainly, the idea here is that using the selectivity of a basic query graph pattern to estimate the cardinality of graph components. Besides, the join strategies offered by Flink are also utilized to facilitate the query optimization.
 ##Tools
