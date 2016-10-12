@@ -63,9 +63,7 @@ public class UnaryOperatorsTest {
 	      GraphExtended<Long, HashSet<String>, HashMap<String, String>, 
 	      Long, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 		  
-	    //graph.getVertices().print();
-	    //graph.getEdges().print();
-	      
+
 	      ScanOperators s = new ScanOperators(graph);
 	     
 	      
@@ -87,20 +85,7 @@ public class UnaryOperatorsTest {
 		  unaryOps.selectVerticesByLabels(4, q3);
 		  unaryOps.projectDistinctVertices(4).print();
 		  
-	      //u.selectVerticesByLabels(0, labels).print();
-	      //HashMap<String, String> props = new HashMap<>();
-	      //props.put("name", "John");
-	      //props.put("age", "48")
-	      //u.selectVerticesByProperties(0, props).print();
-	      //u.selectVertices(0, labels, props).print();
-	      //u.selectVerticesByPropertyComparisons(0, "age", ">", 10).print();
-	      // test on edges?????  
-	      //AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>> q3 = new AND<VertexExtended<Long, HashSet<String>, HashMap<String, String>>>
-		  //(new LabelComparisonForVertices("Person"), new PropertyFilterForVertices("age", "<>", 5));
-	      //LabelComparisonForVertices q3 = new LabelComparisonForVertices("Person");
-	      //PropertyFilterForVertices q3 = new PropertyFilterForVertices("age", "<>", 3);
-	      //u.selectVerticesByBooleanExpressions(0, q3).print();
-	      
+
 	      
 	}
 }

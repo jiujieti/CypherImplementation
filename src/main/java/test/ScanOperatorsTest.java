@@ -14,6 +14,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+/*
+* A test file to simply test all scan operators
+* */
 
 public class ScanOperatorsTest {
  public static void main(String[] args) throws Exception {
@@ -40,7 +43,7 @@ public class ScanOperatorsTest {
 
 	  VertexExtended<Long, HashSet<String>, HashMap<String, String>> v1 =
 			  new VertexExtended<> (1L, vl1, vp1);
- VertexExtended<Long, HashSet<String>, HashMap<String, String>> v2 =
+      VertexExtended<Long, HashSet<String>, HashMap<String, String>> v2 =
 			  new VertexExtended<> (2L, vl2, vp2);
 	  EdgeExtended<Long, Long, String, HashMap<String, String>> e1 =
 			  new EdgeExtended<> (100L, 1L, 2L, el1, ep1);
@@ -57,9 +60,10 @@ public class ScanOperatorsTest {
       GraphExtended<Long, HashSet<String>, HashMap<String, String>,
       Long, String, HashMap<String, String>> graph = GraphExtended.fromCollection(vertexList, edgeList, env);
 
-
+      //Use a scan operator
       ScanOperators s = new ScanOperators(graph);
 
+	  //Select all vertices which have the label "User" and the property age is less than 48.5
       FilterFunction vf;
       vf = new LabelComparisonForVertices("User");
       PropertyFilterForVertices newvf =  new PropertyFilterForVertices("age", "<", "48.5");
