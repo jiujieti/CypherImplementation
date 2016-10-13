@@ -21,8 +21,10 @@ import org.apache.flink.api.java.tuple.Tuple1;
 import org.apache.flink.util.Collector;
 
 @SuppressWarnings("serial")
-/*
-*
+/* UnaryOperators class includes all unary operators:
+* 1. edge-join operator
+* 2. projection operator
+* 3. vertex-join operator (not mentioned in the thesis. In the thesis, when we connect vertices with )
 *
 * */
 public class UnaryOperators {
