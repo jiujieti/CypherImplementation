@@ -60,6 +60,8 @@ More information about [gMark](https://github.com/graphMark/gmark).
 LDBC-SNB can simulates all activities of a user in a social network during a period of time and generate a synthetic social network. It is noticeable that the design principle of LDBC-SNB is not completely duplicating a real-life social network database, but concentrating on making the benchmark queries exhibit certain desired effects.
 
 More information about [LDBC-SNB](http://ldbcouncil.org/developer/snb).
+
+We use LDBC-SNB and gMark to generate our datasets. Since we have already defined our data model, namely the labeled property graph, then we need to transform generated raw datasets into our data structures. By setting the path of your files which store the raw datasets and running the class `GMarkDataGenerator` in package [gmark](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/gmark) or the class `LDBCDataGenerator` in package [ldbc](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/ldbc), the generated datasets will fit into our data model.
 ##How to Run a Test Example or a Query Plan Generator?
 ###Run a Test Example
 ###Run a Query Plan Generator
