@@ -17,10 +17,13 @@ import org.apache.flink.api.java.operators.IterativeDataSet;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 
-/* Using for loop to do the iterations now to collect those vertex IDs
- * Some flaws are still existing here:
- * (4) Duplicated code snippet (a new method to be added) 
- * 
+
+/*
+ * Label matching operators are implemented here:
+ * (1）Define both the upper bound and the lower bound of the number of edges on the paths
+ * (2) Define the upper bound of the number of edges on the paths
+ * (3) Define the lower bound of the number of edges on the paths
+ * (4) Do not define any bounds
  * */
 @SuppressWarnings("serial")
 public class LabelMatchingOperators {
@@ -38,7 +41,8 @@ public class LabelMatchingOperators {
 		this.graph = graph;
 		this.paths = paths;
 	}
-	
+
+	//define both upper bound and lower bound of the number of edges traversed
 	public DataSet<ArrayList<Long>> matchWithBounds(int col, int lb, int ub, String label, JoinHint strategy) throws Exception {
 
 		DataSet<Tuple2<Long, Long>> verticesWorkset = this.paths
@@ -103,8 +107,9 @@ public class LabelMatchingOperators {
 			this.paths = results;
 			return results;
 		}
-	} 
-	
+	}
+
+	//define upper bound and lower bound of the number of edges traversed
 	public DataSet<ArrayList<Long>> matchWithUpperBound(int col, int ub, String label, JoinHint strategy) throws Exception {
 		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration. Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
 		DataSet<Tuple2<Long, Long>> verticesWorkset = this.paths
@@ -142,8 +147,9 @@ public class LabelMatchingOperators {
 		
 		this.paths = results;
 		return results;
-	} 
-	
+	}
+
+	//define lower bound of the number of edges traversed
 	public DataSet<ArrayList<Long>> matchWithLowerBound(int col, int lb, String label, JoinHint strategy) throws Exception {
 		
 		DataSet<Tuple2<Long, Long>> verticesWorkset = this.paths
@@ -200,7 +206,7 @@ public class LabelMatchingOperators {
 		
 	}
 
-	//Return all (source vertex, target vertex) pairs according to unbounded label propogation
+	//Do not define any bounds
 	public DataSet<ArrayList<Long>> matchWithoutBounds(int col, String label, JoinHint strategy) throws Exception {
 		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
 		DataSet<Tuple2<Long, Long>> verticesWorkset = this.paths

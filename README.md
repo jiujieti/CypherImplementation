@@ -51,7 +51,9 @@ and then utilize these statistics to estimate the cardinality of query graph com
 ###Rule-based optimizer
 The rule-based optimizer to generate a query plan is to use heuristic rules to estimate the cardinality of query graph components. Mainly, the idea here is that using the selectivity of a basic query graph pattern to estimate the cardinality of graph components. Besides, the join strategies offered by Flink are also utilized to facilitate the query optimization.
 ##Tools
-We use LDBC-SNB and gMark to generate our datasets. By setting the paths of files where the raw datasets are stored and running the class `GMarkDataGenerator` in package [gmark](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/gmark) or the class `LDBCDataGenerator` in package [ldbc](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/ldbc), the generated raw datasets will fit into our data model defined above. Refer to [here](https://github.com/s1ck/ldbc-flink-import) for a more decent way to import LDBC-SNB data into Gelly model.
+We use LDBC-SNB and gMark to generate our datasets. By setting the paths of files where the raw datasets are stored and running the class `GMarkDataGenerator` in package [gmark](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/gmark) or the class `LDBCDataGenerator` in package [ldbc](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/ldbc), the generated raw datasets will fit into our data model defined above.
+
+Refer to [this link](https://github.com/s1ck/ldbc-flink-import) for a more decent way to import LDBC-SNB data into Gelly model provided by others.
 ###gMark
 gMark is a dataset generator used in the project. Based on the design principles of gMark, gMark provides schema-driven generation of graphs and queries by utilizing a graph configuration. In term of generated graph instances, node types, edge types, both including proportions to the whole instance, and in- and out-degree distributions could all be defined by the users.
 

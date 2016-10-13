@@ -24,7 +24,7 @@ import org.apache.flink.util.Collector;
 /* UnaryOperators class includes all unary operators:
 * 1. edge-join operator
 * 2. projection operator
-* 3. vertex-join operator (not mentioned in the thesis. In the thesis, when we connect vertices with )
+* 3. vertex-join operator (not mentioned in the thesis. In the thesis and the implementation of data generator, when we connect vertices, we usually use a scan operator to select the vertex and then a join operator. Here the vertex-join operator combines these two functions.)
 *
 * */
 public class UnaryOperators {

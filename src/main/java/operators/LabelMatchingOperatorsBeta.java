@@ -18,6 +18,11 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.util.Collector;
 @SuppressWarnings("serial")
 
+
+/*
+* A more efficient way to implement label matching operator by using delta iterator in Flink
+* So far only work with non-circle query pattern
+* */
 public class LabelMatchingOperatorsBeta {
 	//Input graph
 	private final GraphExtended<Long, HashSet<String>, HashMap<String, String>, Long,
