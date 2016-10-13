@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import org.apache.flink.api.java.functions.KeySelector;
 
 /*
- * key selector for the 
+ * key selector is used for determining the position of a vertex or an edge in a path ArrayList
  * 
  * */
 @SuppressWarnings("serial")

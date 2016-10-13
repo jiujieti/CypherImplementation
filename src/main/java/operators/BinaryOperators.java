@@ -1,9 +1,19 @@
 package operators;
 
 import java.util.ArrayList;
+
+import org.apache.flink.api.common.functions.FlatJoinFunction;
 import org.apache.flink.api.common.functions.JoinFunction;
 import org.apache.flink.api.java.DataSet;
-
+import org.apache.flink.util.Collector;
+/*
+*
+* All binary operators are implemented here.
+* 1. Join operator. Each join operation joins two paths on a common vertex. The difference between joinOnBeforeVertices and joinOnAfterVertices is about the concatenation order of this two paths;
+* 2. Union operator.
+* 3. Intersection operator.
+*
+* */
 @SuppressWarnings("serial")
 public class BinaryOperators {
 	
@@ -95,10 +105,10 @@ public class BinaryOperators {
 		return intersectedResults;
 	}
 	
-	private static class IntersectionResultsMerge implements JoinFunction<ArrayList<Long>, ArrayList<Long>, ArrayList<Long>> {
+	private static class IntersectionResultsMerge implements FlatJoinFunction<ArrayList<Long>, ArrayList<Long>, ArrayList<Long>> {
 		@Override
-		public ArrayList<Long> join(ArrayList<Long> leftPaths, ArrayList<Long> rightPaths) throws Exception {
-			return leftPaths;
+		public void join(ArrayList<Long> leftPath, ArrayList<Long> rightPath, Collector<ArrayList<Long>> intersectedPath) throws Exception {
+			if(leftPath.equals(rightPath)) intersectedPath.collect(leftPath);
 		}
 	}
 	

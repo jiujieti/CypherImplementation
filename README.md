@@ -39,7 +39,7 @@ Basic operators are defined to perform queries on a labeled property graph. All 
 
 6. `Projection operator`: a projection operator matches edge identifiers or vertex identifiers with corresponding edges or vertices in the graph instance and then collects all these components.
 
-The implementation of basic operators could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators).
+The implementation of basic operators could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators). Note that an intersection operator is also implemented even though it is not mention that in the thesis.
 
 ###Filtering Conditions
 
