@@ -39,87 +39,61 @@ public class LabelMatchingOperatorsBeta {
 		this.paths = paths;
 	}
 	
-	
+    //Only the one with upper bound is implemented
 	public DataSet<ArrayList<Long>> matchWithUpperBound(int col, int ub, String label, JoinHint strategy) throws Exception {
 		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration. Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
 		DataSet<Tuple2<Long, Tuple2<Long, Long>>> initialSolutionSet = this.paths
 				.map(new ExtractVertexIds(col));
 
 		int maxIterations = ub;
-		
+
 		DataSet<Tuple2<Long, Tuple2<Long, Long>>> initialWorkSet = initialSolutionSet;
-		
-		DeltaIteration<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>> iteration = initialSolutionSet
-			    .iterateDelta(initialWorkSet, maxIterations, 1);
-		
-		//replication detected
-		//still wrong
-/*		DataSet<Tuple2<Long, Tuple2<Long, Long>>> nextWorkset = iteration
-				.getSolutionSet()
-				.coGroup(iteration
-						.getWorkset()
-						.join(graph.getEdges(), strategy)
-						.where(0)
-						.equalTo(1)
-						.with(new FilterEdgesByLabel(label)))
-				.where(1)
-				.equalTo(1)
-				.with(new GetNewResults())
-				;*/
-		
+
+		DeltaIteration<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>> iteration = initialSolutionSet.iterateDelta(initialWorkSet, maxIterations, 1);
 		DataSet<Tuple2<Long, Tuple2<Long, Long>>> nextWorkset = iteration
 				.getWorkset()
 				.join(graph.getEdges(), strategy)
 				.where(0)
 				.equalTo(1)
 				.with(new FilterEdgesByLabel(label));
-		
-		/*DataSet<Tuple2<Long, Tuple2<Long, Long>>> deltas = iteration
-				.getSolutionSet()
-				.coGroup(newResults)
-				.where(1)
-				.equalTo(1)
-				.with(new UpdateResults());	*/
-		
+
 		DataSet<Tuple2<Long, Tuple2<Long, Long>>> deltas = iteration
 				.getSolutionSet()
 				.coGroup(nextWorkset)
 				.where(1)
 				.equalTo(1)
-				.with(new GetNewResults());
- 	
+                .with(new GetNewResults());
 
-	    DataSet<Tuple2<Long, Tuple2<Long, Long>>> mergedResults = iteration.closeWith(deltas, nextWorkset);
+		DataSet<Tuple2<Long, Tuple2<Long, Long>>> mergedResults = iteration.closeWith(deltas, nextWorkset);
+
 	    KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
 	    DataSet<ArrayList<Long>> results = this.paths
 				.join(mergedResults.map(new ExtractVertexPairs()))
 				.where(verticesSelector)
 				.equalTo(0)
 				.with(new UpdateVertexAndEdgeIds());
-	
-		this.paths = results;
-		
-		return results;
-	}
-	
-	private static class ExtractVertexIds implements MapFunction<ArrayList<Long>, Tuple2<Long, Tuple2<Long, Long>>> {
-		
-		private int col;
-		
-		public ExtractVertexIds(int col) {this.col = col;}
 
+		this.paths = results;
+
+		return results;
+
+	}
+
+	private static class ExtractVertexIds implements MapFunction<ArrayList<Long>,
+			Tuple2<Long, Tuple2<Long, Long>>>{
+		private int col = 0;
+		ExtractVertexIds(int column) { this.col = column; }
 		@Override
 		public Tuple2<Long, Tuple2<Long, Long>> map(ArrayList<Long> idsOfVerticesAndEdges)
 				throws Exception {
-			Tuple2<Long, Long> result = new Tuple2<>(idsOfVerticesAndEdges.get(col), idsOfVerticesAndEdges.get(col));
-			return new Tuple2<Long, Tuple2<Long, Long>>(idsOfVerticesAndEdges.get(col), result) ;
+			return new Tuple2<Long, Tuple2<Long, Long>>(idsOfVerticesAndEdges.get(col), new Tuple2<Long, Long>(idsOfVerticesAndEdges.get(col), idsOfVerticesAndEdges.get(col)));
 		}
 	}
-	
-	private static class FilterEdgesByLabel implements FlatJoinFunction<Tuple2<Long, Tuple2<Long, Long>>, EdgeExtended<Long, Long, String, HashMap<String, String>>, 
+
+	private static class FilterEdgesByLabel implements FlatJoinFunction<Tuple2<Long, Tuple2<Long, Long>>, EdgeExtended<Long, Long, String, HashMap<String, String>>,
 		Tuple2<Long, Tuple2<Long, Long>>> {
 		private String label;
-		
+
 		public FilterEdgesByLabel(String label) {this.label = label;}
 
 		@Override
@@ -133,26 +107,8 @@ public class LabelMatchingOperatorsBeta {
 				vertices.collect(new Tuple2<Long, Tuple2<Long, Long>>(edge.f2, result));
 			}
 		}
-	}
-	
-		
-	/*private static class UpdateResults implements CoGroupFunction<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>,
-	 Tuple2<Long, Tuple2<Long, Long>>> {
+    }
 
-		@Override
-		public void coGroup(Iterable<Tuple2<Long, Tuple2<Long, Long>>> prevVertexIds,
-				Iterable<Tuple2<Long, Tuple2<Long, Long>>> newVertexIds,
-				Collector<Tuple2<Long, Tuple2<Long, Long>>> newResults)
-				throws Exception {
-			for (Tuple2<Long, Tuple2<Long, Long>> prev : prevVertexIds) {
-				newResults.collect(prev);
-			}
-			for (Tuple2<Long, Tuple2<Long, Long>> next: newVertexIds) {
-				newResults.collect(next);
-			}
-		}
-	}*/
-	
 	private static class GetNewResults implements CoGroupFunction<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>> {
 
 		@Override
@@ -168,10 +124,10 @@ public class LabelMatchingOperatorsBeta {
 				if (!prevVertices.contains(next)) {
 					vertices.collect(next);
 				}
-			}	
+			}
 		}
 	}
-	
+
 	private static class UpdateVertexAndEdgeIds implements FlatJoinFunction<ArrayList<Long>, Tuple2<Long, Long>, ArrayList<Long>> {
 
 		@Override
@@ -182,7 +138,7 @@ public class LabelMatchingOperatorsBeta {
 			updateIdsList.collect(vertexAndEdgeIds);
 		}
 	}
-	
+
 	private static class ExtractVertexPairs implements MapFunction<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Long>> {
 
 		@Override
@@ -190,97 +146,6 @@ public class LabelMatchingOperatorsBeta {
 				throws Exception {
 			return vertexIds.f1;
 		}
-		
-	}
-	
-	//match with bounds
-	public DataSet<ArrayList<Long>> matchWithBounds(int col, int lb, int ub, String label, JoinHint strategy) throws Exception {
-		int minIterations = lb;
-		int maxIterations = ub;
-		
-		//Initial WorkSet DataSet consisting of vertex-pair IDs for Delta Iteration. Each field of Tuple2<Long, Long> stores two same IDs since these two are starting vertices
-		DataSet<Tuple2<Long, Long>> initialWorkSet = this.paths
-				.map(new ExtractInitialVertexIds(col));
-			
-		IterativeDataSet<Tuple2<Long, Long>> getInitialWorkset = initialWorkSet.iterate(minIterations);
-		
-		DataSet<Tuple2<Long, Long>> initialResults = getInitialWorkset
-				.join(graph.getEdges(), strategy)
-				.where(1)
-				.equalTo(1)
-				.with(new FilterEdgesByLabelForBulkIteration(label));
-		
-		DataSet<Tuple2<Long, Tuple2<Long, Long>>> workSet = getInitialWorkset
-				.closeWith(initialResults)
-				.map(new GetStartingVertexIds())
-				.distinct();
-		
-		if(minIterations == maxIterations){
-		//	DataSet<Tuple2<Long, Tuple2<Long, Long>>> results = workSet
-			return null;
-	    }
-		else {
-			DataSet<Tuple2<Long, Tuple2<Long, Long>>> initialSolutionSet = workSet;
-		
-			DeltaIteration<Tuple2<Long, Tuple2<Long, Long>>, Tuple2<Long, Tuple2<Long, Long>>> iteration = initialSolutionSet
-					.iterateDelta(workSet, maxIterations, 1);
-		
-			DataSet<Tuple2<Long, Tuple2<Long, Long>>> nextWorkset = iteration
-					.getWorkset()
-					.join(graph.getEdges(), strategy)
-					.where(0)
-					.equalTo(1)
-					.with(new FilterEdgesByLabel(label));
-		
-			DataSet<Tuple2<Long, Tuple2<Long, Long>>> deltas = iteration
-					.getSolutionSet()
-					.coGroup(nextWorkset)
-					.where(1)
-					.equalTo(1)
-					.with(new GetNewResults());
- 	
-			DataSet<Tuple2<Long, Tuple2<Long, Long>>> mergedResults = iteration.closeWith(deltas, nextWorkset);   
-			KeySelectorForColumns verticesSelector = new KeySelectorForColumns(col);
-			
-		    DataSet<ArrayList<Long>> results = this.paths
-					.join(mergedResults.map(new ExtractVertexPairs()))
-					.where(verticesSelector)
-					.equalTo(1)
-					.with(new UpdateVertexAndEdgeIds());
-		    return results;
-		}
-		//return paths; 	
-	}
-	
-	private static class ExtractInitialVertexIds implements MapFunction<ArrayList<Long>, Tuple2<Long, Long>> {
-		private int col;
-		public ExtractInitialVertexIds(int col) {this.col = col;}
-		@Override
-		public Tuple2<Long, Long> map(ArrayList<Long> idsOfVertices) throws Exception {
-			return new Tuple2<Long, Long>(idsOfVertices.get(col), idsOfVertices.get(col));
-		}
-	}
-	
-	private static class FilterEdgesByLabelForBulkIteration implements FlatJoinFunction<Tuple2<Long, Long>, 
-		EdgeExtended<Long, Long, String, HashMap<String, String>>, Tuple2<Long, Long>> {
-		private String label;
-		public FilterEdgesByLabelForBulkIteration(String label) {this.label = label;}
-		@Override
-		public void join(
-				Tuple2<Long, Long> vertexIds,
-				EdgeExtended<Long, Long, String, HashMap<String, String>> edge,
-				Collector<Tuple2<Long, Long>> vertices) throws Exception {
-			if(edge.getLabel().equals(label)) {
-				vertices.collect(vertexIds);
-			}
-		} 
-	}
-	
-	private static class GetStartingVertexIds implements MapFunction<Tuple2<Long, Long>, Tuple2<Long, Tuple2<Long, Long>>> {
-		@Override
-		public Tuple2<Long, Tuple2<Long, Long>> map(Tuple2<Long, Long> vertexIds)
-				throws Exception {
-			return new Tuple2<Long, Tuple2<Long, Long>>(vertexIds.f1, vertexIds);
-		}		
+
 	}
 }
