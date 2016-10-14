@@ -43,6 +43,10 @@ The implementation of basic operators could be found [here](https://github.com/j
 
 ###Filtering Conditions
 
+The filtering conditions consist of all [boolean expressions](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators/booleanExpressions) and specific comparisons of properties.
+
+Note that so far the query optimizers only support conjunctive filtering conditions, namely `AND` boolean expressions.
+
 ##Query Execution Strategies
 Two types of query execution strategies have been implemented, which could be found [here](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/queryplan).
 ###Cost-based optimizer
