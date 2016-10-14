@@ -78,5 +78,19 @@ Then open the project with an IDE and here we recommend IntelliJ IDEA. If you ha
 If you want to run a test example in a command prompt, refer to [this link](https://ci.apache.org/projects/flink/flink-docs-release-1.1/quickstart/setup_quickstart.html). 
 
 ###Run a Query Plan Generator
+If you want to build your queries, you could use either the cost-based optimizer or the rule-based optimizer. To use these two optimizers, you need to specify the paths where the edge dataset and the vertex dataset are stored as well as input the query graph as shown in classes named `CostBasedOptimizerTest` and `RuleBasedOptimizerTest`.
 
+A query graph requires to be constructed when inputting a query. The query graph is slightly different from the graph data model. A query vertex could be represented as:
 
+```
+QueryVertex(String: label, HashMap<String, String>: properties, boolean: isReturnedValue)
+```
+The member `label` and `properties` in a query vertex represent the specific label constraint and the property constraints on a vertex. The last member `isReturnedValue` is a boolean value, declaring whether this vertex should be returned or not.
+
+A vertex edge is shown as
+
+```
+QueryEdge(QueryVertex: sourceVertex, QueryVertex: targetVertex, String: label, HashMap<String, String>: properties)
+```
+
+`label` and `properties` here are the same as of the query vertices. A query edge also includes the source query vertex and the target query vertex. Then construct a query graph shown in the test examples, the query optimizers will take care of the optimization of the query.
