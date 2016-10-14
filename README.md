@@ -45,6 +45,28 @@ The implementation of basic operators could be found [here](https://github.com/j
 
 The filtering conditions consist of all [boolean expressions](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/operators/booleanExpressions) and specific comparisons of properties.
 
+Boolean expressions includes the following relations:
+1. `AND`
+
+2. `OR`
+
+3. `XOR`
+
+4. `NOT`
+
+The following comparisons could be applied on property values:
+1. `>`
+
+2. `<`
+
+3. `=`
+
+4. `>=`
+
+5. `<=`
+
+6. `<>`
+
 Note that so far the query optimizers only support conjunctive filtering conditions, namely `AND` boolean expressions.
 
 ##Query Execution Strategies
