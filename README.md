@@ -64,5 +64,9 @@ LDBC-SNB can simulates all activities of a user in a social network during a per
 More information about [LDBC-SNB](http://ldbcouncil.org/developer/snb).
 
 ##How to Run a Test Example or a Query Plan Generator?
+To run test examples provided in [test](https://github.com/jiujieti/CypherImplementation/tree/master/src/main/java/test) package or develop your own queries by utilizing a query plan generator, first you need to build Apache Flink from source and setting up an IDE. Details of building Flink from source and setting up an IDE could be found in [this link](https://github.com/apache/flink). 
+
 ###Run a Test Example
+
+
 ###Run a Query Plan Generator
