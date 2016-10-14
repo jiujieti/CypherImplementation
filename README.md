@@ -87,10 +87,10 @@ QueryVertex(String: label, HashMap<String, String>: properties, boolean: isRetur
 ```
 The member `label` and `properties` in a query vertex represent the specific label constraint and the property constraints on a vertex. The last member `isReturnedValue` is a boolean value, declaring whether this vertex should be returned or not.
 
-A vertex edge is shown as
+A query edge is shown as
 
 ```
-QueryEdge(QueryVertex: sourceVertex, QueryVertex: targetVertex, String: label, HashMap<String, String>: properties)
+QueryEdge(QueryVertex: srcV, QueryVertex: tarV, String: label, HashMap<String, String>: properties)
 ```
 
 `label` and `properties` here are the same as of the query vertices. A query edge also includes the source query vertex and the target query vertex. Then construct a query graph shown in the test examples, the query optimizers will take care of the optimization of the query.
